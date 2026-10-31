@@ -76,7 +76,7 @@ final class MonitorSettingsWindow: NSWindowController, NSWindowDelegate, NSTable
         tabs.translatesAutoresizingMaskIntoConstraints = false; root.addArrangedSubview(tabs)
         let displayTab = NSTabViewItem(identifier: "display"); displayTab.label = "显示项目"
         let display = NSStackView(); display.orientation = .vertical; display.spacing = 10; display.edgeInsets = NSEdgeInsets(top:12,left:12,bottom:12,right:12)
-        let description = NSTextField(wrappingLabelWithString: "Touch Bar 和菜单栏可分别选择；放不下的项目进入更多。拖动行或使用上移／下移。")
+        let description = NSTextField(wrappingLabelWithString: "Touch Bar 和菜单栏摘要可分别选择。菜单栏勾选值显示在状态图标旁，空间不足时按顺序收进“···”；左键查看详情，右键打开完整菜单。拖动行或使用上移／下移调整顺序。")
         display.addArrangedSubview(description)
         let modeRow = NSStackView(); modeRow.spacing = 10
         modeRow.addArrangedSubview(NSTextField(labelWithString: "Touch Bar 模式"))
@@ -89,7 +89,7 @@ final class MonitorSettingsWindow: NSWindowController, NSWindowDelegate, NSTable
         deviceSummary.lineBreakMode = .byWordWrapping
         deviceSummary.font = .systemFont(ofSize: 11)
         display.addArrangedSubview(deviceSummary)
-        for (id,title,width) in [("name","项目",220.0),("bar","Touch Bar",88.0),("menu","菜单栏",70.0),("preview","当前值",200.0)] {
+        for (id,title,width) in [("name","项目",220.0),("bar","Touch Bar",88.0),("menu","菜单栏摘要",88.0),("preview","当前值",200.0)] {
             let column = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(id)); column.title = title; column.width = width; table.addTableColumn(column)
         }
         table.dataSource = self; table.delegate = self; table.rowHeight = 30; table.usesAlternatingRowBackgroundColors = true
@@ -289,7 +289,7 @@ final class MonitorSettingsWindow: NSWindowController, NSWindowDelegate, NSTable
         panel.message = "导出版本、内置显示项、性能趋势和脱敏事件。不会包含聊天正文、脚本、账户信息或原始输出；系统服务私有日志需另行读取。"
         guard panel.runModal() == .OK, let destination = panel.url else { return }
         exporting = true; dashboard.exportButton.isEnabled = false; dashboard.status.stringValue = "正在整理诊断…"
-        let summary: [String: Any] = ["build": Bundle.main.object(forInfoDictionaryKey:"CFBundleVersion") as? String ?? "4", "os": ProcessInfo.processInfo.operatingSystemVersionString, "architecture": deviceCapabilities.architectureDescription, "modelIdentifier": deviceCapabilities.modelIdentifier ?? "unknown", "touchBarMode": GoodTouchBarRuntimeConfiguration.selectedMode().rawValue, "touchBarEnabled": deviceCapabilities.resolveTouchBarMode(GoodTouchBarRuntimeConfiguration.selectedMode()).enabled, "exportedAt": ISO8601DateFormatter().string(from:Date()), "visibleMetrics": manager.visibleKeys.filter { MetricID(rawValue:$0) != nil }, "menuMetrics": manager.menuKeys.filter { MetricID(rawValue:$0) != nil }, "cpuTemperatureSource": manager.selectedCPUTemperatureKey, "fanCapability": deviceCapabilities.fanCapabilityReason, "state": diagnosticState?() ?? [:]]
+        let summary: [String: Any] = ["build": Bundle.main.object(forInfoDictionaryKey:"CFBundleVersion") as? String ?? "5", "os": ProcessInfo.processInfo.operatingSystemVersionString, "architecture": deviceCapabilities.architectureDescription, "modelIdentifier": deviceCapabilities.modelIdentifier ?? "unknown", "touchBarMode": GoodTouchBarRuntimeConfiguration.selectedMode().rawValue, "touchBarEnabled": deviceCapabilities.resolveTouchBarMode(GoodTouchBarRuntimeConfiguration.selectedMode()).enabled, "exportedAt": ISO8601DateFormatter().string(from:Date()), "visibleMetrics": manager.visibleKeys.filter { MetricID(rawValue:$0) != nil }, "menuMetrics": manager.menuKeys.filter { MetricID(rawValue:$0) != nil }, "cpuTemperatureSource": manager.selectedCPUTemperatureKey, "fanCapability": deviceCapabilities.fanCapabilityReason, "state": diagnosticState?() ?? [:]]
         let history = monitor.history.points
         DispatchQueue.global(qos:.utility).async { [weak self] in
             let outcome: Bool

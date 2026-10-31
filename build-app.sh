@@ -2,8 +2,8 @@
 set -euo pipefail
 
 ROOT_DIR="${0:A:h}"
-RELEASE_VERSION="0.3.1"
-BUILD_NUMBER="4"
+RELEASE_VERSION="0.3.5"
+BUILD_NUMBER="8"
 BUILD_CONFIGURATION="${BUILD_CONFIGURATION:-release}"
 ARCH="$(/usr/bin/uname -m)"
 OPEN_APP=0
@@ -27,7 +27,7 @@ case "$ARCH" in arm64|x86_64) ;; *) print -u2 "不支持的目标架构：$ARCH"
 TARGET_TRIPLE="${TARGET_TRIPLE:-$ARCH-apple-macosx13.0}"
 [[ "$TARGET_TRIPLE" == "$ARCH-apple-macosx13.0" ]] || { print -u2 "TARGET_TRIPLE 与 --arch 不匹配"; exit 64; }
 
-TASK_BUILD_DIR="${BUILD_SCRATCH_PATH:-$(mktemp -d "/private/tmp/goodtouchbar-031-${ARCH}-build.XXXXXX")}" 
+TASK_BUILD_DIR="${BUILD_SCRATCH_PATH:-$(mktemp -d "/private/tmp/goodtouchbar-035-${ARCH}-build.XXXXXX")}"
 TASK_MODULE_CACHE="${TASK_MODULE_CACHE:-$TASK_BUILD_DIR/module-cache}"
 DIST_DIR="${DIST_OUTPUT_DIR:-$ROOT_DIR/dist}"
 APP_DIR="${APP_OUTPUT_DIR:-$DIST_DIR/$RELEASE_VERSION/$ARCH/goodtouchbar.app}"
@@ -88,6 +88,8 @@ cp -R "$ROOT_DIR/Resources/WorkBuddyRetry" "$APP_DIR/Contents/Resources/WorkBudd
 cp -R "$ROOT_DIR/Presets" "$APP_DIR/Contents/Resources/Presets"
 cp -R "$ROOT_DIR/Licenses" "$APP_DIR/Contents/Resources/Licenses"
 cp "$ROOT_DIR/THIRD-PARTY-NOTICES.md" "$APP_DIR/Contents/Resources/"
+cp "$ROOT_DIR/Resources/GoodTouchBar.icns" "$APP_DIR/Contents/Resources/GoodTouchBar.icns"
+cp "$ROOT_DIR/Resources/codex-status-icon.png" "$APP_DIR/Contents/Resources/codex-status-icon.png"
 
 /usr/bin/codesign --force --options runtime --identifier io.github.yihuirui.goodtouchbar.sensors --sign "$IDENTITY" "$APP_DIR/Contents/MacOS/GoodTouchSensors" >/dev/null
 if [[ "$ARCH" == x86_64 ]]; then

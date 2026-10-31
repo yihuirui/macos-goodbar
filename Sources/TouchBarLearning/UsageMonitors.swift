@@ -163,6 +163,55 @@ struct CodexQuotaSnapshot: Equatable {
         }.joined(separator: " · ")
     }
 
+    /// Compact menu-bar value. The five-hour reset is an absolute local clock
+    /// time; detailed reset countdowns remain in the menu and Touch Bar text.
+    var statusBarText: String {
+        statusBarText(now: Date(), timeZone: .autoupdatingCurrent)
+    }
+
+    func statusBarText(now: Date, timeZone: TimeZone) -> String {
+        if windows.isEmpty {
+            return awaitingReset ? "5h待更新 · 7d待更新" : "5h -- · 7d --"
+        }
+        let values = [("5h", "5小时"), ("7d", "7天")].map { key, label in
+            guard let window = windows.first(where: { $0.label == label }) else {
+                return key == "5h" ? "5h --（重置未知）" : "7d --"
+            }
+            let reset = key == "5h"
+                ? "（\(Self.localResetText(window.resetAt, now: now, timeZone: timeZone))）"
+                : ""
+            return "\(key)余\(window.remainingPercent)%\(reset)"
+        }.joined(separator: " · ")
+        return values + (isStale ? "·旧" : "")
+    }
+
+    private static func localResetText(_ resetAt: Date?, now: Date, timeZone: TimeZone) -> String {
+        guard let resetAt else { return "重置未知" }
+        guard resetAt > now else { return "重置已过" }
+
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = timeZone
+        let today = calendar.startOfDay(for: now)
+        let resetDay = calendar.startOfDay(for: resetAt)
+        let dayOffset = calendar.dateComponents([.day], from: today, to: resetDay).day ?? 2
+
+        let clockFormatter = DateFormatter()
+        clockFormatter.locale = Locale(identifier: "en_US_POSIX")
+        clockFormatter.calendar = calendar
+        clockFormatter.timeZone = timeZone
+        clockFormatter.dateFormat = "HH:mm"
+        let clock = clockFormatter.string(from: resetAt)
+        switch dayOffset {
+        case 0:
+            return "\(clock)重置"
+        case 1:
+            return "明日\(clock)重置"
+        default:
+            clockFormatter.dateFormat = "MM-dd HH:mm"
+            return "\(clockFormatter.string(from: resetAt))重置"
+        }
+    }
+
     var menuText: String {
         windowText
     }

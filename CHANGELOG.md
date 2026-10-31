@@ -2,6 +2,31 @@
 
 User-visible changes for each release are listed here.
 
+## 0.3.5 (build 8) — Codex status icon and reset clock
+
+- Restore the original full-color Codex status icon when quota is selected; keep the black thumbs-up Dock icon unchanged.
+- Show the five-hour quota's absolute local reset time, with tomorrow/date labels across calendar days. Unknown and expired times remain explicit, and stale data stays marked.
+- Preserve 12 pt white status text and at least three selected summary items; widen the measured ceiling modestly for the longer time label.
+- Bundle verification checks the copied Codex PNG byte-for-byte against the original resource.
+
+## 0.3.4 (build 7) — experimental preview
+
+- Render the status summary as a full-color image inside the native status button so menu-bar vibrancy cannot recolor the fixed white 12 pt text.
+- Preserve the compact two-window Codex quota, readable three-item layout, accessibility value, and native left/right status actions.
+- Verify real `NSStatusBarButton` raster output across Aqua, Dark Aqua, Vibrant Light and Vibrant Dark appearances on gray backgrounds.
+
+## 0.3.3 (build 6) — experimental preview
+
+- Render status values in fixed white 12 pt text and allow a roomy item width so at least three selected values remain readable.
+- Give the selected Codex quota a compact five-hour and weekly percentage summary; keep reset details, stale state, and unavailable state available.
+- Preserve quota visibility when it appears later in the saved selection order, while retaining relative order for other selected items and bounding long custom values with ellipses.
+
+## 0.3.2 (build 5) — experimental preview
+
+- Restore the original black thumbs-up bundle and Dock icon, and make menu-only launches available from the Dock.
+- Show checkbox-selected menu values beside the status icon in saved order, cap the item width, and keep an icon-only state when no menu values are selected.
+- Keep left-click status details and right-click full-menu actions, with display settings reachable from the Dock-opened window and app menu.
+
 ## 0.3.1 (build 4) — experimental preview
 
 - Refine the native status details hierarchy using Hallmark and Impeccable design guidance: quieter grouping, clearer quota and token information, and more distinct WorkBuddy actions.

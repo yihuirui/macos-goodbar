@@ -39,3 +39,6 @@ dist/
 
 # Local design-skill reference downloads
 /.design-tools/
+
+# Local build handoff artifacts
+/outputs/

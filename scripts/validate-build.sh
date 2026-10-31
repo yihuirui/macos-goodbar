@@ -17,8 +17,13 @@ bundle_name=$(/usr/bin/plutil -extract CFBundleName raw -o - "$INFO_PLIST")
 short_version=$(/usr/bin/plutil -extract CFBundleShortVersionString raw -o - "$INFO_PLIST")
 bundle_version=$(/usr/bin/plutil -extract CFBundleVersion raw -o - "$INFO_PLIST")
 touchbar_default=$(/usr/bin/plutil -extract GoodTouchBarTouchBarDefault raw -o - "$INFO_PLIST")
+icon_file=$(/usr/bin/plutil -extract CFBundleIconFile raw -o - "$INFO_PLIST")
 [[ "$bundle_identifier" == "io.github.yihuirui.goodtouchbar" && "$display_name" == "goodtouchbar" && "$bundle_name" == "goodtouchbar" ]] || { print -u2 "FAIL: brand or bundle identity mismatch"; exit 1; }
-[[ "$short_version" == "0.3.1" && "$bundle_version" == "4" && "$touchbar_default" == "auto" ]] || { print -u2 "FAIL: version or Auto mode metadata mismatch"; exit 1; }
+[[ "$short_version" == "0.3.5" && "$bundle_version" == "8" && "$touchbar_default" == "auto" ]] || { print -u2 "FAIL: version or Auto mode metadata mismatch"; exit 1; }
+[[ "$icon_file" == "GoodTouchBar.icns" && -f "$APP_DIR/Contents/Resources/$icon_file" ]] || { print -u2 "FAIL: configured app icon is missing"; exit 1; }
+/usr/bin/cmp -s "$SOURCE_DIR/Resources/GoodTouchBar.icns" "$APP_DIR/Contents/Resources/$icon_file" || { print -u2 "FAIL: bundled app icon differs from the source icon"; exit 1; }
+[[ -f "$APP_DIR/Contents/Resources/codex-status-icon.png" ]] || { print -u2 "FAIL: bundled Codex summary icon is missing"; exit 1; }
+/usr/bin/cmp -s "$SOURCE_DIR/Resources/codex-status-icon.png" "$APP_DIR/Contents/Resources/codex-status-icon.png" || { print -u2 "FAIL: bundled Codex summary icon differs from the original resource"; exit 1; }
 
 for binary in "$MAIN_EXECUTABLE" "$SENSOR_EXECUTABLE"; do
     [[ "$(/usr/bin/lipo -archs "$binary")" == "$ARCH" ]] || { print -u2 "FAIL: binary architecture differs from $ARCH: $binary"; exit 1; }
@@ -56,4 +61,4 @@ source_build=$(/usr/bin/awk -F'= ' '/public static let fallback/{print $2}' "$SO
 for resource in Presets/专注AI.json Presets/系统监控.json; do
     [[ -f "$APP_DIR/Contents/Resources/$resource" ]] || { print -u2 "FAIL: bundled preset missing: $resource"; exit 1; }
 done
-print "PASS: goodtouchbar 0.3.1 build 4, $ARCH app architecture, signatures, runtime policy, and presets verified"
+print "PASS: goodtouchbar 0.3.5 build 8, $ARCH app architecture, icons, signatures, runtime policy, and presets verified"

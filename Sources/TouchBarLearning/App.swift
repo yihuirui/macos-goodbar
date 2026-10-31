@@ -184,6 +184,17 @@ private enum TouchBarAgentIcon {
 private enum StatusBarIconCatalog {
     private static var cache: [String: NSImage] = [:]
     private static var stateCache: [String: NSImage] = [:]
+    private static var codexSummaryIcon: NSImage?
+
+    static func codexSummaryImage() -> NSImage? {
+        if let codexSummaryIcon { return codexSummaryIcon }
+        guard let url = Bundle.main.url(forResource: "codex-status-icon", withExtension: "png"),
+              let image = NSImage(contentsOf: url) else { return nil }
+        image.size = NSSize(width: 16, height: 16)
+        image.isTemplate = false
+        codexSummaryIcon = image
+        return image
+    }
 
     static func image(named resourceName: String) -> NSImage? {
         if let cached = cache[resourceName] {
@@ -798,7 +809,7 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSTouchB
         if MetricID(rawValue: key) != nil { return metricsMonitor.snapshot.text(for: key) }
         switch key {
         case TouchBarPluginKey.gptStatus: return gptStatusTouchBarText
-        case TouchBarPluginKey.gptUsage: return gptUsageTouchBarText
+        case TouchBarPluginKey.gptUsage: return statusBarQuotaText
         case TouchBarPluginKey.workbuddy: return workbuddyTouchBarText
         case TouchBarPluginKey.agentSpeed: return agentSpeedTouchBarText
         case TouchBarPluginKey.todayTokens: return tokenTouchBarText
@@ -883,35 +894,27 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSTouchB
 
     func usesLegacyPomodoroStatusItem() -> Bool { touchBarEnabled && pluginManager.configuration.version == nil }
 
-    private var statusMenuLayout: (visible: [String], overflow: [String]) {
-        DisplayLayout.fit(pluginManager.menuKeys.filter { touchBarEnabled && !usesLegacyPomodoroStatusItem() || $0 != TouchBarPluginKey.pomodoro }, budget: 380, moreWidth: 32) { key in
-            MetricID(rawValue: key) != nil ? self.fixedWidth(for: key) * 0.8 : min(160, self.estimatedButtonWidth(for: self.displayText(for: key)))
-        }
-    }
     func statusBarSummaryText() -> String {
-        let keys = statusMenuLayout.visible
-        return keys.isEmpty ? "GoodTouchBar · 点击打开菜单" : keys.map(displayText(for:)).joined(separator: " · ")
+        statusBarSummaryPresentation().attributedTitle.string
     }
 
-    func statusBarSummaryAttributedText() -> NSAttributedString {
-        let layout = statusMenuLayout
-        var text = layout.visible.map(displayText(for:)).joined(separator: "  ")
-        if !layout.overflow.isEmpty { text += " ···" }
-        if text.isEmpty { text = "◉" }
-        return NSAttributedString(string: text, attributes: [.font: NSFont.monospacedDigitSystemFont(ofSize: 11, weight: .regular), .foregroundColor: NSColor.labelColor])
+    func statusBarSummaryPresentation() -> StatusBarSummaryPresentation {
+        let keys = pluginManager.menuKeys.filter {
+            touchBarEnabled && !usesLegacyPomodoroStatusItem() || $0 != TouchBarPluginKey.pomodoro
+        }
+        return StatusBarSummaryPresentation.make(keys: keys) { self.displayText(for: $0) }
     }
 
     func pomodoroStatusBarAttributedText() -> NSAttributedString {
         let attributes: [NSAttributedString.Key: Any] = [
-            .font: NSFont.monospacedDigitSystemFont(ofSize: 11, weight: .regular),
-            // The top menu bar has a light background in this TouchBar build.
-            .foregroundColor: NSColor.black,
+            .font: NSFont.monospacedDigitSystemFont(ofSize: 12, weight: .medium),
+            .foregroundColor: NSColor.white,
         ]
         return NSAttributedString(string: model.statusBarSummaryText, attributes: attributes)
     }
 
     private var statusBarQuotaText: String {
-        quotaMonitor.snapshot.touchBarText
+        quotaMonitor.snapshot.statusBarText
     }
 
     private var statusBarTokenText: String {
@@ -1878,6 +1881,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var windowController: MainWindowController!
     private var pomodoroStatusItem: NSStatusItem?
     private var statusItem: NSStatusItem!
+    private var statusItemSourceIcon: NSImage?
     private var statusMenu: NSMenu?
     private var statusDetailsPopover: StatusDetailsPopoverController?
     private var healthMonitor: HealthMonitor!
@@ -1902,19 +1906,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         StandardStreamLogLimiter.shared.start()
-        NSApp.applicationIconImage = NSImage(systemSymbolName: "slider.horizontal.3", accessibilityDescription: "goodtouchbar")
+        installBundleApplicationIcon()
         let capabilities = GoodTouchBarDeviceCapabilities.current
         let modeResolution = GoodTouchBarRuntimeConfiguration.resolution(capabilities: capabilities)
         appUsesTouchBar = modeResolution.enabled
-        if appUsesTouchBar {
-            NSApp.setActivationPolicy(.regular)
-        } else {
-            NSApp.setActivationPolicy(.accessory)
-        }
+        // Keep the app visible in the Dock in both Touch Bar and menu-only
+        // modes. The status item remains available when its windows are closed.
+        NSApp.setActivationPolicy(.regular)
         touchBarLogger.notice("applicationDidFinishLaunching")
 
         healthMonitor = HealthMonitor()
         windowController = MainWindowController(healthMonitor: healthMonitor, touchBarEnabled: appUsesTouchBar, deviceCapabilities: capabilities)
+        installApplicationMenu()
         if appUsesTouchBar,
            let touchBar = windowController.touchBarForGlobalPresentation() {
             let presenter = GlobalTouchBarPresenter(touchBar: touchBar)
@@ -1940,10 +1943,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         pomodoroStatusItem?.button?.sendAction(on: [.leftMouseUp])
         pomodoroStatusItem?.button?.title = "🍅--"
         pomodoroStatusItem?.button?.font = .monospacedDigitSystemFont(
-            ofSize: 11,
-            weight: .regular
+            ofSize: 12,
+            weight: .medium
         )
-        pomodoroStatusItem?.button?.contentTintColor = NSColor.black
+        pomodoroStatusItem?.button?.contentTintColor = NSColor.white
         pomodoroStatusItem?.button?.toolTip = "点击开始番茄钟"
         }
 
@@ -1951,11 +1954,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem.autosaveName = NSStatusItem.AutosaveName(
             "io.github.yihuirui.goodtouchbar.summary"
         )
-        statusItem.button?.image = NSImage(
+        if let icon = NSImage(
             systemSymbolName: "bolt.horizontal.circle",
             accessibilityDescription: "goodtouchbar 状态详情"
-        )
-        statusItem.button?.imagePosition = .imageOnly
+        ) {
+            icon.isTemplate = true
+            icon.size = NSSize(width: 16, height: 16)
+            statusItemSourceIcon = icon
+            statusItem.button?.image = icon
+        }
         statusItem.button?.target = self
         statusItem.button?.action = #selector(handleStatusItemAction)
         statusItem.button?.sendAction(on: [.leftMouseUp, .rightMouseUp])
@@ -2188,6 +2195,52 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 globalTouchBar: self.globalTouchBarPresenter?.snapshot ?? .disabled
             )
         }
+    }
+
+    private func installBundleApplicationIcon() {
+        guard let iconURL = Bundle.main.url(forResource: "GoodTouchBar", withExtension: "icns"),
+              let icon = NSImage(contentsOf: iconURL) else {
+            touchBarLogger.error("Bundled GoodTouchBar.icns is missing or unreadable")
+            return
+        }
+        NSApp.applicationIconImage = icon
+    }
+
+    private func installApplicationMenu() {
+        let mainMenu = NSMenu()
+        let applicationName = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? "goodtouchbar"
+        let applicationItem = NSMenuItem(title: applicationName, action: nil, keyEquivalent: "")
+        let applicationMenu = NSMenu(title: applicationName)
+
+        let openItem = applicationMenu.addItem(
+            withTitle: "打开 GoodTouchBar",
+            action: #selector(showMainWindow),
+            keyEquivalent: "o"
+        )
+        openItem.target = self
+        let settingsItem = applicationMenu.addItem(
+            withTitle: "性能监控与显示设置…",
+            action: #selector(showMonitorSettings),
+            keyEquivalent: ","
+        )
+        settingsItem.target = self
+        settingsItem.keyEquivalentModifierMask = [.command]
+        applicationMenu.addItem(.separator())
+        let quitItem = applicationMenu.addItem(
+            withTitle: "退出 goodtouchbar",
+            action: #selector(quitApp),
+            keyEquivalent: "q"
+        )
+        quitItem.target = self
+
+        applicationItem.submenu = applicationMenu
+        mainMenu.addItem(applicationItem)
+        NSApp.mainMenu = mainMenu
+    }
+
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        if !flag { showMainWindow() }
+        return true
     }
 
     @discardableResult
@@ -2540,7 +2593,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if let windowController {
             pomodoroStatusItem?.button?.attributedTitle = windowController.pomodoroStatusBarAttributedText()
             pomodoroStatusItem?.button?.toolTip = "点击开始番茄钟 · \(windowController.pomodoroMenuTitle())"
-            statusItem?.button?.title = ""
+            if let button = statusItem?.button, let fallbackIcon = statusItemSourceIcon {
+                let summary = windowController.statusBarSummaryPresentation()
+                let icon = summary.visibleKeys.contains(TouchBarPluginKey.gptUsage)
+                    ? (StatusBarIconCatalog.codexSummaryImage() ?? fallbackIcon)
+                    : fallbackIcon
+                summary.apply(to: button, icon: icon)
+                statusItem.length = summary.itemLength
+            }
             statusItem?.button?.toolTip = "goodtouchbar · 点击查看状态详情 · 右键打开完整菜单"
             statusDetailsPopover?.update(
                 windowController.statusDetailsSnapshot(menuBarMode: !appUsesTouchBar)
@@ -2548,7 +2608,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         } else {
             pomodoroStatusItem?.button?.title = "🍅--"
             pomodoroStatusItem?.button?.toolTip = "点击开始番茄钟"
-            statusItem?.button?.title = ""
+            if let button = statusItem?.button, let icon = statusItemSourceIcon {
+                let emptySummary = StatusBarSummaryPresentation.make(keys: []) { _ in "" }
+                emptySummary.apply(to: button, icon: icon)
+                statusItem.length = emptySummary.itemLength
+            }
             statusItem?.button?.toolTip = "goodtouchbar · 点击查看状态详情 · 右键打开完整菜单"
         }
         ensureStatusBarItemsVisible()

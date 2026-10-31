@@ -27,6 +27,57 @@ import SystemMonitoring
         let q=CodexQuotaMonitor(sessionDirectory:expired);var qChanged=false;q.onChange={qChanged=true}
         q.refresh();await settle {qChanged}
         check(q.snapshot.remainingPercent == nil && q.snapshot.awaitingReset && q.snapshot.touchBarText.contains("待更新"),"expired weekly quota never reports previous remaining")
+        let quotaWindows = [
+            CodexQuotaWindowSnapshot(label:"5小时",remainingPercent:79,resetAt:Date().addingTimeInterval(3600),resetText:"42分钟"),
+            CodexQuotaWindowSnapshot(label:"7天",remainingPercent:75,resetAt:Date().addingTimeInterval(86400),resetText:"23小时"),
+        ]
+        let compactQuota = CodexQuotaSnapshot(remainingPercent:75,resetAt:nil,resetText:"",windowLabel:"7天",windows:quotaWindows,updatedAt:Date(),updatedAgeText:"刚刚",isStale:false)
+        check(compactQuota.statusBarText.contains("5h余79%") && compactQuota.statusBarText.contains("重置") &&
+              compactQuota.windowText.contains("42分钟") && compactQuota.touchBarText.contains("42分钟") &&
+              !compactQuota.statusBarText.contains("42分钟"),"menu quota uses compact percentages while detailed and Touch Bar reset text stays intact")
+        let staleQuota = CodexQuotaSnapshot(remainingPercent:75,resetAt:nil,resetText:"",windowLabel:"7天",windows:quotaWindows,updatedAt:Date().addingTimeInterval(-86400),updatedAgeText:"1天前",isStale:true)
+        var awaitingQuota = CodexQuotaSnapshot.unavailable
+        awaitingQuota.awaitingReset = true
+        check(staleQuota.statusBarText.contains("旧") && staleQuota.statusBarText.contains("79%") &&
+              awaitingQuota.statusBarText == "5h待更新 · 7d待更新" &&
+              CodexQuotaSnapshot.unavailable.statusBarText == "5h -- · 7d --",
+              "compact quota keeps stale, awaiting-reset, and unknown states distinct")
+        let fixedTimezone = TimeZone(identifier:"Asia/Shanghai")!
+        let fixedDateFormatter = ISO8601DateFormatter()
+        func fixedDate(_ value:String) -> Date { fixedDateFormatter.date(from:value)! }
+        func quotaWithReset(_ resetAt:Date?, stale:Bool = false) -> CodexQuotaSnapshot {
+            CodexQuotaSnapshot(
+                remainingPercent:65,
+                resetAt:resetAt,
+                resetText:"server countdown is not the status clock",
+                windowLabel:"7天",
+                windows:[
+                    CodexQuotaWindowSnapshot(label:"5小时",remainingPercent:38,resetAt:resetAt,resetText:"server countdown"),
+                    CodexQuotaWindowSnapshot(label:"7天",remainingPercent:65,resetAt:nil,resetText:""),
+                ],
+                updatedAt:fixedDate("2026-10-27T09:00:00+08:00"),
+                updatedAgeText:"刚刚",
+                isStale:stale
+            )
+        }
+        let localMorning = fixedDate("2026-10-27T09:00:00+08:00")
+        let sameDayClock = quotaWithReset(fixedDate("2026-10-27T15:30:00+08:00"))
+        check(sameDayClock.statusBarText(now:localMorning,timeZone:fixedTimezone) == "5h余38%（15:30重置） · 7d余65%",
+              "five-hour quota uses an absolute local reset clock on the same day")
+        let nearMidnight = fixedDate("2026-10-27T22:30:00+08:00")
+        let nextDayClock = quotaWithReset(fixedDate("2026-10-28T01:30:00+08:00"))
+        check(nextDayClock.statusBarText(now:nearMidnight,timeZone:fixedTimezone).contains("（明日01:30重置）"),
+              "reset tomorrow is labeled across local midnight")
+        let laterDate = quotaWithReset(fixedDate("2026-10-30T03:00:00+08:00"))
+        check(laterDate.statusBarText(now:localMorning,timeZone:fixedTimezone).contains("（10-30 03:00重置）"),
+              "reset beyond tomorrow includes a month-day and local clock")
+        let unknownClock = quotaWithReset(nil)
+        check(unknownClock.statusBarText(now:localMorning,timeZone:fixedTimezone).contains("（重置未知）") &&
+              unknownClock.windowText.contains("server countdown"),
+              "unknown absolute reset stays explicit and does not parse countdown text")
+        let pastReset = quotaWithReset(fixedDate("2026-10-27T08:59:00+08:00"),stale:true)
+        check(pastReset.statusBarText(now:localMorning,timeZone:fixedTimezone) == "5h余38%（重置已过） · 7d余65%·旧",
+              "expired stale reset is not shown as a future local clock")
         let current=try directory("current");try save(quotaEvent(reset:Date().addingTimeInterval(0.8),shortReset:Date().addingTimeInterval(0.8)),current)
         let live=CodexQuotaMonitor(sessionDirectory:current);var liveChanged=false;live.onChange={liveChanged=true}
         live.refresh();await settle {liveChanged}

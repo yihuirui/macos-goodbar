@@ -361,10 +361,13 @@ private final class StatusBarButtonActionProbe: NSObject {
         ) { _ in String(repeating:"温度📊custom-reading-",count:40) }
         narrowSummary.apply(to:summaryButton,icon:summaryIcon)
         let narrowFont = narrowSummary.attributedTitle.attribute(.font, at:0, effectiveRange:nil) as? NSFont
-        // Report the measured geometry so a failure on another macOS build shows
-        // which limit was missed instead of only the assertion label.
+        // Report the measured geometry on stderr, which stays unbuffered when a
+        // precondition traps, so a failure on another macOS build names the
+        // limit that was missed instead of only the assertion label.
         let narrowTitle = narrowSummary.attributedTitle.string
-        print("DIAG narrow summary: itemLength=\(narrowSummary.itemLength) visible=\(narrowSummary.visibleKeys.count) overflow=\(narrowSummary.overflowKeys.count) ellipsis=\(narrowTitle.contains("…")) marker=\(narrowTitle.contains("···")) font=\(narrowFont?.pointSize ?? -1) titleWidth=\((narrowTitle as NSString).size(withAttributes:[.font:narrowFont ?? NSFont.systemFont(ofSize:12)]).width)")
+        let narrowTitleWidth = (narrowTitle as NSString)
+            .size(withAttributes:[.font:narrowFont ?? NSFont.systemFont(ofSize:12)]).width
+        FileHandle.standardError.write(Data("DIAG narrow summary: itemLength=\(narrowSummary.itemLength) visible=\(narrowSummary.visibleKeys.count) overflow=\(narrowSummary.overflowKeys.count) ellipsis=\(narrowTitle.contains("…")) marker=\(narrowTitle.contains("···")) font=\(narrowFont?.pointSize ?? -1) titleWidth=\(narrowTitleWidth) ceiling=\(StatusBarSummaryPresentation.maximumItemWidth)\n".utf8))
         // The renderer deliberately exceeds a requested width that cannot hold
         // three legible slots, so assert the global ceiling rather than the
         // requested 180 pt; font fallback for CJK and emoji differs between

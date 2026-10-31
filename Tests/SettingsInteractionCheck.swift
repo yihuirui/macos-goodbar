@@ -356,8 +356,14 @@ private final class StatusBarButtonActionProbe: NSObject {
               quotaReserved.attributedTitle.string.contains("···") && quotaReserved.itemLength <= 220,
               "selected Codex quota reserves a visible slot while other selected items retain relative order")
 
+        // Sixteen keys cannot fit at 180 pt even when every value is reduced to
+        // a single ellipsis, so the overflow marker is guaranteed regardless of
+        // how a macOS build resolves the CJK and emoji fallback fonts. Five keys
+        // were not enough: on the GitHub macos-15 runners all five fitted as
+        // ellipses and the overflow assertion failed.
+        let manyNarrowKeys = (0..<16).map { "custom.narrow.\($0)" }
         let narrowSummary = StatusBarSummaryPresentation.make(
-            keys:["system.cpu", "system.memory", "system.pressure", "custom.long", "custom.longer"], maximumItemWidth:180
+            keys:manyNarrowKeys, maximumItemWidth:180
         ) { _ in String(repeating:"温度📊custom-reading-",count:40) }
         narrowSummary.apply(to:summaryButton,icon:summaryIcon)
         let narrowFont = narrowSummary.attributedTitle.attribute(.font, at:0, effectiveRange:nil) as? NSFont

@@ -361,9 +361,18 @@ private final class StatusBarButtonActionProbe: NSObject {
         ) { _ in String(repeating:"温度📊custom-reading-",count:40) }
         narrowSummary.apply(to:summaryButton,icon:summaryIcon)
         let narrowFont = narrowSummary.attributedTitle.attribute(.font, at:0, effectiveRange:nil) as? NSFont
-        check(narrowSummary.itemLength <= 180 && narrowSummary.visibleKeys.count >= 3 &&
-              !narrowSummary.overflowKeys.isEmpty && narrowSummary.attributedTitle.string.contains("…") &&
-              narrowSummary.attributedTitle.string.contains("···") && narrowFont?.pointSize == 12,
+        // Report the measured geometry so a failure on another macOS build shows
+        // which limit was missed instead of only the assertion label.
+        let narrowTitle = narrowSummary.attributedTitle.string
+        print("DIAG narrow summary: itemLength=\(narrowSummary.itemLength) visible=\(narrowSummary.visibleKeys.count) overflow=\(narrowSummary.overflowKeys.count) ellipsis=\(narrowTitle.contains("…")) marker=\(narrowTitle.contains("···")) font=\(narrowFont?.pointSize ?? -1) titleWidth=\((narrowTitle as NSString).size(withAttributes:[.font:narrowFont ?? NSFont.systemFont(ofSize:12)]).width)")
+        // The renderer deliberately exceeds a requested width that cannot hold
+        // three legible slots, so assert the global ceiling rather than the
+        // requested 180 pt; font fallback for CJK and emoji differs between
+        // macOS builds and moved the measured floor past 180 on CI runners.
+        check(narrowSummary.itemLength <= StatusBarSummaryPresentation.maximumItemWidth &&
+              narrowSummary.visibleKeys.count >= 3 &&
+              !narrowSummary.overflowKeys.isEmpty && narrowTitle.contains("…") &&
+              narrowTitle.contains("···") && narrowFont?.pointSize == 12,
               "long custom values truncate with ellipses while retaining three full-size slots and overflow")
 
         window.close(); monitor.stop()

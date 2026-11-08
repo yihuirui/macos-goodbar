@@ -2,9 +2,11 @@
 
 **Version 0.3.5 · build 8 · experimental preview**
 
-goodtouchbar is an experimental macOS companion for Intel and Apple silicon Macs. It brings AI activity, selected system metrics, and everyday controls into a configurable menu and, on supported hardware, a Touch Bar. Touch Bar availability depends on the Mac model, not on whether the processor is Intel or Apple silicon. The source is maintained in the public repository; preview packages are distributed through GitHub Releases.
+goodtouchbar is an experimental macOS companion for Intel and Apple silicon Macs. It brings AI activity, selected system metrics, and everyday controls into a configurable menu and, on supported hardware, a Touch Bar. Touch Bar availability depends on the Mac model, not on whether the processor is Intel or Apple silicon. The source is maintained in a **private repository**; preview packages are distributed through its GitHub Releases and are only available to accounts with repository access.
 
-[GitHub repository](https://github.com/yihuirui/goodtouchbar) · [Releases](https://github.com/yihuirui/goodtouchbar/releases) · [简体中文](README.zh-CN.md) · [Hardware compatibility](docs/COMPATIBILITY.md) · [Build and CI](docs/BUILDING.md) · [Install and remove](docs/INSTALLATION.md) · [Privacy](docs/PRIVACY.md) · [Presets](docs/PRESETS.md) · [Design influences](docs/PROJECT-INFLUENCES.md)
+[Private GitHub repository](https://github.com/yihuirui/goodtouchbar) · [Releases (requires access)](https://github.com/yihuirui/goodtouchbar/releases) · [简体中文](README.zh-CN.md) · [Hardware compatibility](docs/COMPATIBILITY.md) · [Build and CI](docs/BUILDING.md) · [Install and remove](docs/INSTALLATION.md) · [Privacy](docs/PRIVACY.md) · [Presets](docs/PRESETS.md) · [Design influences](docs/PROJECT-INFLUENCES.md)
+
+> **Repository status:** this repository is currently private. The source and Releases links above require repository access and are not publicly reachable. To distribute preview builds externally, publish them from a separate public repository or attach them to a public release.
 
 ## What it does
 

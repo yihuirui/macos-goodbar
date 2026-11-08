@@ -2,9 +2,11 @@
 
 **版本 0.3.5 · build 8 · 实验预览版**
 
-goodtouchbar 是面向 Intel 与 Apple 芯片 Mac 的实验性 macOS 工具，将 AI 活动、部分系统指标和常用控制放入可配置的菜单与受支持硬件上的 Touch Bar。Touch Bar 是否存在取决于具体机型，不能只根据 Intel 或 Apple 芯片架构判断。源码在公开仓库维护，预览安装包通过 GitHub Releases 分发。
+goodtouchbar 是面向 Intel 与 Apple 芯片 Mac 的实验性 macOS 工具，将 AI 活动、部分系统指标和常用控制放入可配置的菜单与受支持硬件上的 Touch Bar。Touch Bar 是否存在取决于具体机型，不能只根据 Intel 或 Apple 芯片架构判断。源码在**私有仓库**维护，预览安装包通过该仓库的 GitHub Releases 分发，仅对有仓库访问权限的账号可见。
 
-[GitHub 仓库](https://github.com/yihuirui/goodtouchbar) · [Release 页面](https://github.com/yihuirui/goodtouchbar/releases) · [English](README.md) · [硬件兼容性](docs/COMPATIBILITY.md) · [构建与 CI](docs/BUILDING.md) · [安装与卸载](docs/INSTALLATION.md) · [隐私说明](docs/PRIVACY.md) · [预设说明](docs/PRESETS.md) · [设计参考](docs/PROJECT-INFLUENCES.md)
+[私有 GitHub 仓库](https://github.com/yihuirui/goodtouchbar) · [Release 页面（需访问权限）](https://github.com/yihuirui/goodtouchbar/releases) · [English](README.md) · [硬件兼容性](docs/COMPATIBILITY.md) · [构建与 CI](docs/BUILDING.md) · [安装与卸载](docs/INSTALLATION.md) · [隐私说明](docs/PRIVACY.md) · [预设说明](docs/PRESETS.md) · [设计参考](docs/PROJECT-INFLUENCES.md)
+
+> **仓库状态：**本仓库目前为私有仓库。上方的源码与 Release 链接需要仓库访问权限，外部无法打开。若要对外分发预览安装包，请改用独立的公开仓库或发布到公开 Release。
 
 ## 功能
 

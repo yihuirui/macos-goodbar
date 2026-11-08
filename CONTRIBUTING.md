@@ -18,7 +18,7 @@ TEST_ARCH=arm64 /bin/zsh scripts/test-public.sh
 /bin/zsh build-app.sh --arch arm64 --no-open
 ```
 
-Use `TEST_ARCH=x86_64` and `--arch x86_64` for the Intel package. Both scripts default to native architecture when no override is provided. The public packages are separate architecture builds, not a universal binary. CI uses matching Intel and Apple silicon runners with `contents: read`; a manually dispatched run saves architecture-specific artifacts and does not publish a release. A successful build or automated check is not evidence of physical Touch Bar presentation, player response, or real fan-write behavior.
+Use `TEST_ARCH=x86_64` and `--arch x86_64` for the Intel package. Both scripts default to native architecture when no override is provided. The public packages are separate architecture builds, not a universal binary. CI uses matching Intel and Apple silicon runners with `contents: read`. Runs are grouped per ref with `concurrency`, so a newer push cancels an in-progress run for the same branch instead of leaving several 45-minute macOS builds queued. A manually dispatched run saves architecture-specific artifacts and does not publish a release. A successful build or automated check is not evidence of physical Touch Bar presentation, player response, or real fan-write behavior.
 
 Build identifiers: the Swift package and main executable are `GoodTouchBar`; the read-only sensor executable is `GoodTouchSensors`; the privileged fan service is `GoodTouchFanHelper` and is packaged only for confirmed native Intel execution. The app bundle ID is `io.github.yihuirui.goodtouchbar` and the fan helper service ID is `io.github.yihuirui.goodtouchbar.fan-helper`. Per-user app state belongs under `~/Library/Application Support/GoodTouchBar`.
 

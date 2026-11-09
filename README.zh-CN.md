@@ -63,7 +63,7 @@ Intel 构建请使用 `TEST_ARCH=x86_64` 和 `--arch x86_64`。本机原生构�
 
 ## 参与贡献
 
-欢迎提交问题、范围明确的改进和文档更新。请先阅读[贡献指南](CONTRIBUTING.md)。不要在公开 issue 中附上私有会话数据、凭据或未经脱敏的日志。安全问题请按 [SECURITY.md](SECURITY.md) 报告。
+欢迎提交问题、范围明确的改进和文档更新。请先阅读[贡献指南](CONTRIBUTING.md)。不要在公开 issue 中附上私有会话数据、凭据或未经脱敏的日志。安全问题请按 [SECURITY.md](SECURITY.md) 报告。使用问题见 [SUPPORT.md](SUPPORT.md)；本项目利用业余时间维护，没有响应时限。
 
 ## 许可证
 

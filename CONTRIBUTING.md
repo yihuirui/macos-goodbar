@@ -32,3 +32,11 @@ Build identifiers: the Swift package and main executable are `GoodTouchBar`; the
 - Preserve third-party copyright and license notices for any newly added external material. Ask before adding a new runtime dependency.
 
 By submitting a contribution, you agree that your original contribution is offered under the repository's MIT License. This does not relicense third-party material.
+
+## Maintenance expectations
+
+goodtouchbar is maintained in spare time with limited weekly hours. There is no response SLA; if you have not heard back after seven days, a polite comment on the same thread is appropriate.
+
+We prioritize reproducible defects, safety-sensitive fixes, tests and documentation. Requests that change the project's scope (new hardware control, new runtime dependencies, or changes to the preset import schema) may be closed with a short explanation and a reference to this document. Refusing a patch is a temporary decision; accepting it means maintaining it for a long time.
+
+Keep scope, design and release discussions in the repository's issues and pull requests so everyone sees the same context. For usage questions, see [SUPPORT.md](SUPPORT.md); for vulnerabilities, see [SECURITY.md](SECURITY.md).

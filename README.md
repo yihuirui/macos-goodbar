@@ -63,7 +63,7 @@ Read the full [privacy and data handling notes](docs/PRIVACY.md) and [security r
 
 ## Contributing
 
-Bug reports, focused improvements, and documentation updates are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md). Do not attach private session data, credentials, or unredacted logs to a public issue. Report security issues using [SECURITY.md](SECURITY.md).
+Bug reports, focused improvements, and documentation updates are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md). Do not attach private session data, credentials, or unredacted logs to a public issue. Report security issues using [SECURITY.md](SECURITY.md). For usage questions, see [SUPPORT.md](SUPPORT.md). The project is maintained in spare time, with no response SLA.
 
 ## License
 

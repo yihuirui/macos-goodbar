@@ -12,6 +12,8 @@ private let pluginLogger = Logger(
 enum TouchBarPluginKey {
     static let gptStatus = "gpt.status"
     static let gptUsage = "gpt.usage"
+    /// 额度拆分后的 7 天窗口独立项；5h 窗口沿用 `gpt.usage`。
+    static let gptUsage7d = "gpt.usage7d"
     static let workbuddy = "workbuddy.status"
     static let agentSpeed = "agent.speed"
     /// Build42 用过这个键，Build43 起统一为 `agent.speed`，迁移时就地改名。
@@ -24,6 +26,7 @@ enum TouchBarPluginKey {
     static let defaultOrder = [
         gptStatus,
         gptUsage,
+        gptUsage7d,
         workbuddy,
         agentSpeed,
         todayTokens,
@@ -328,6 +331,29 @@ final class TouchBarPluginManager {
                 let updated = try JSONSerialization.data(withJSONObject:migrated,options:[.prettyPrinted,.sortedKeys,.withoutEscapingSlashes])
                 try validate(JSONDecoder().decode(TouchBarPluginConfiguration.self,from:updated))
                 let backup = configurationURL.appendingPathExtension("before-build43")
+                if !FileManager.default.fileExists(atPath:backup.path) { try data.write(to:backup,options:.atomic); try FileManager.default.setAttributes([.posixPermissions:0o600],ofItemAtPath:backup.path) }
+                try updated.write(to:configurationURL,options:.atomic)
+                try FileManager.default.setAttributes([.posixPermissions:0o600],ofItemAtPath:configurationURL.path)
+                data = updated
+            }
+            if let object = try JSONSerialization.jsonObject(with:data) as? [String:Any], (object["quotaSplitVersion"] as? Int ?? 0) < 1 {
+                // 「7 天额度」拆成 5h／7d 两个独立项：已有配置里紧跟 gpt.usage
+                // 插入 gpt.usage7d，保持拆分前的显示内容，其余顺序不变。
+                var migrated = object
+                func insertingQuota7d(_ list: [String]) -> [String] {
+                    guard list.contains(TouchBarPluginKey.gptUsage), !list.contains(TouchBarPluginKey.gptUsage7d) else { return list }
+                    var copy = list
+                    if let index = copy.firstIndex(of: TouchBarPluginKey.gptUsage) { copy.insert(TouchBarPluginKey.gptUsage7d, at: index + 1) }
+                    else { copy.append(TouchBarPluginKey.gptUsage7d) }
+                    return copy
+                }
+                migrated["order"] = insertingQuota7d(migrated["order"] as? [String] ?? TouchBarPluginKey.defaultOrder)
+                migrated["menuOrder"] = insertingQuota7d(migrated["menuOrder"] as? [String] ?? [TouchBarPluginKey.gptUsage, TouchBarPluginKey.todayTokens, TouchBarPluginKey.pomodoro])
+                migrated["catalogOrder"] = insertingQuota7d(migrated["catalogOrder"] as? [String] ?? (migrated["order"] as? [String] ?? TouchBarPluginKey.defaultOrder))
+                migrated["quotaSplitVersion"] = 1
+                let updated = try JSONSerialization.data(withJSONObject:migrated,options:[.prettyPrinted,.sortedKeys,.withoutEscapingSlashes])
+                try validate(JSONDecoder().decode(TouchBarPluginConfiguration.self,from:updated))
+                let backup = configurationURL.appendingPathExtension("before-quota-split")
                 if !FileManager.default.fileExists(atPath:backup.path) { try data.write(to:backup,options:.atomic); try FileManager.default.setAttributes([.posixPermissions:0o600],ofItemAtPath:backup.path) }
                 try updated.write(to:configurationURL,options:.atomic)
                 try FileManager.default.setAttributes([.posixPermissions:0o600],ofItemAtPath:configurationURL.path)

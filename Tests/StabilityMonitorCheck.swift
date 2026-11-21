@@ -78,6 +78,17 @@ import SystemMonitoring
         let pastReset = quotaWithReset(fixedDate("2026-10-27T08:59:00+08:00"),stale:true)
         check(pastReset.statusBarText(now:localMorning,timeZone:fixedTimezone) == "5h余38%（重置已过） · 7d余65%·旧",
               "expired stale reset is not shown as a future local clock")
+        check(sameDayClock.statusBarText(now:localMorning,timeZone:fixedTimezone,scope:.fiveHour) == "5h余38%（15:30重置）" &&
+              sameDayClock.statusBarText(now:localMorning,timeZone:fixedTimezone,scope:.sevenDay) == "7d余65%",
+              "scoped status text renders each quota window independently")
+        check(awaitingQuota.statusBarText(scope:.fiveHour) == "5h待更新" &&
+              awaitingQuota.statusBarText(scope:.sevenDay) == "7d待更新" &&
+              CodexQuotaSnapshot.unavailable.statusBarText(scope:.fiveHour) == "5h --" &&
+              CodexQuotaSnapshot.unavailable.statusBarText(scope:.sevenDay) == "7d --",
+              "scoped status text keeps awaiting and unknown states distinct per window")
+        check(compactQuota.touchBarText(scope:.fiveHour).contains("5小时") && !compactQuota.touchBarText(scope:.fiveHour).contains("7天") &&
+              compactQuota.touchBarText(scope:.sevenDay).contains("7天") && !compactQuota.touchBarText(scope:.sevenDay).contains("5小时"),
+              "scoped touch bar text renders each quota window independently")
         let current=try directory("current");try save(quotaEvent(reset:Date().addingTimeInterval(0.8),shortReset:Date().addingTimeInterval(0.8)),current)
         let live=CodexQuotaMonitor(sessionDirectory:current);var liveChanged=false;live.onChange={liveChanged=true}
         live.refresh();await settle {liveChanged}

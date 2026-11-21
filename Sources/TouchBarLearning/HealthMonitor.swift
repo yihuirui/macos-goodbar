@@ -14,6 +14,7 @@ struct TouchBarRuntimeProbe {
     let touchBarItemReady: Bool
     let codexTouchBarItemReady: Bool
     let quotaTouchBarItemReady: Bool
+    let quota7dTouchBarItemReady: Bool
     let workbuddyTouchBarItemReady: Bool
     let tokenTouchBarItemReady: Bool
     let renderCount: Int
@@ -63,6 +64,7 @@ struct TouchBarRuntimeProbe {
         touchBarItemReady: false,
         codexTouchBarItemReady: false,
         quotaTouchBarItemReady: false,
+        quota7dTouchBarItemReady: false,
         workbuddyTouchBarItemReady: false,
         tokenTouchBarItemReady: false,
         renderCount: 0,
@@ -110,6 +112,7 @@ struct TouchBarHealthSnapshot: Codable {
     let touchBarItemReady: Bool
     let codexTouchBarItemReady: Bool
     let quotaTouchBarItemReady: Bool
+    let quota7dTouchBarItemReady: Bool
     let workbuddyTouchBarItemReady: Bool
     let tokenTouchBarItemReady: Bool
     let renderCount: Int
@@ -253,6 +256,7 @@ final class HealthMonitor: NSObject {
         } else if probe.touchBarEnabled && (!probe.touchBarItemReady
                     || !probe.codexTouchBarItemReady
                     || !probe.quotaTouchBarItemReady
+                    || !probe.quota7dTouchBarItemReady
                     || !probe.workbuddyTouchBarItemReady
                     || !probe.tokenTouchBarItemReady) {
             status = "waiting"
@@ -301,7 +305,7 @@ final class HealthMonitor: NSObject {
         message: String
     ) -> TouchBarHealthSnapshot {
         TouchBarHealthSnapshot(
-            schemaVersion: 9,
+            schemaVersion: 10,
             app: "GoodTouchBar",
             pid: Int32(ProcessInfo.processInfo.processIdentifier),
             status: status,
@@ -314,6 +318,7 @@ final class HealthMonitor: NSObject {
             touchBarItemReady: probe.touchBarItemReady,
             codexTouchBarItemReady: probe.codexTouchBarItemReady,
             quotaTouchBarItemReady: probe.quotaTouchBarItemReady,
+            quota7dTouchBarItemReady: probe.quota7dTouchBarItemReady,
             workbuddyTouchBarItemReady: probe.workbuddyTouchBarItemReady,
             tokenTouchBarItemReady: probe.tokenTouchBarItemReady,
             renderCount: probe.renderCount,

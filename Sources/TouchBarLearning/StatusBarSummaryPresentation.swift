@@ -7,6 +7,8 @@ import SystemMonitoring
 struct StatusBarSummaryPresentation {
     static let maximumItemWidth: CGFloat = 520
     static let summaryFontSize: CGFloat = 12
+    /// 拆分后的两个额度窗口项：空间分配时享受配额特判（占位保留、最后收窄）。
+    static let quotaKeys: Set<String> = [TouchBarPluginKey.gptUsage, TouchBarPluginKey.gptUsage7d]
 
     private static let preferredItemWidth: CGFloat = 460
     private static let minimumItemWidth: CGFloat = 32
@@ -70,19 +72,19 @@ struct StatusBarSummaryPresentation {
             return (key, value.isEmpty ? "—" : value)
         })
         var displayedValues = rawValues.mapValues { truncate($0, to: maximumValueWidth, font: font, widthOf: widthOf) }
-        // Quota has a fixed compact format with both windows. Keep all of it
-        // when there is room; the space allocator below only shortens it after
-        // the other required values have reached their own ellipsis floor.
-        if let quotaText = rawValues[TouchBarPluginKey.gptUsage] {
-            displayedValues[TouchBarPluginKey.gptUsage] = quotaText
+        // Quota windows have a fixed compact format. Keep all of it when there
+        // is room; the space allocator below only shortens them after the other
+        // required values have reached their own ellipsis floor.
+        for quotaKey in Self.quotaKeys where rawValues[quotaKey] != nil {
+            displayedValues[quotaKey] = rawValues[quotaKey]
         }
 
         var requiredKeys = Array(orderedKeys.prefix(requiredCount))
-        if orderedKeys.count > requiredCount,
-           let quotaIndex = orderedKeys.firstIndex(of: TouchBarPluginKey.gptUsage),
-           quotaIndex >= requiredCount {
-            requiredKeys = Array(orderedKeys.filter { $0 != TouchBarPluginKey.gptUsage }.prefix(requiredCount - 1))
-                + [TouchBarPluginKey.gptUsage]
+        let quotaKeysBeyond = orderedKeys.enumerated().filter { !requiredKeys.contains($0.element) && Self.quotaKeys.contains($0.element) }.map(\.element)
+        if orderedKeys.count > requiredCount, !quotaKeysBeyond.isEmpty {
+            let reservedQuotaKeys = orderedKeys.filter { requiredKeys.contains($0) && Self.quotaKeys.contains($0) } + quotaKeysBeyond
+            requiredKeys = Array(orderedKeys.filter { !Self.quotaKeys.contains($0) }.prefix(max(0, requiredCount - quotaKeysBeyond.count)))
+                + reservedQuotaKeys
             requiredKeys.sort { orderedKeys.firstIndex(of: $0)! < orderedKeys.firstIndex(of: $1)! }
         }
 
@@ -107,11 +109,11 @@ struct StatusBarSummaryPresentation {
         }
         let titleBudget = effectiveMaximum - iconAndInsetsWidth
         while widthOf(composedTitle(requiredKeys, includesOverflow: includesInitialOverflow)) > titleBudget {
-            let nonQuotaKeys = requiredKeys.filter { $0 != TouchBarPluginKey.gptUsage }
-            let shrinkOrder = (nonQuotaKeys + requiredKeys.filter { $0 == TouchBarPluginKey.gptUsage })
+            let nonQuotaKeys = requiredKeys.filter { !Self.quotaKeys.contains($0) }
+            let shrinkOrder = (nonQuotaKeys + requiredKeys.filter { Self.quotaKeys.contains($0) })
                 .sorted { lhs, rhs in
-                    let lhsIsQuota = lhs == TouchBarPluginKey.gptUsage
-                    let rhsIsQuota = rhs == TouchBarPluginKey.gptUsage
+                    let lhsIsQuota = Self.quotaKeys.contains(lhs)
+                    let rhsIsQuota = Self.quotaKeys.contains(rhs)
                     if lhsIsQuota != rhsIsQuota { return !lhsIsQuota }
                     return widthOf(displayedValues[lhs] ?? "") > widthOf(displayedValues[rhs] ?? "")
                 }

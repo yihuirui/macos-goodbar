@@ -29,9 +29,13 @@ import SystemMonitoring
             // Build43 起旧配置会自动补上「AI 速度」项，其余顺序不变。
             XCTAssertEqual(manager.visibleKeys,["gpt.status","agent.speed"])
             XCTAssertTrue(FileManager.default.fileExists(atPath:file.appendingPathExtension("before-build43").path))
-            XCTAssertEqual(manager.menuKeys,["gpt.usage","tokens.today","pomodoro"])
+            // 额度拆分起旧配置会自动在 gpt.usage 后补上「7d 额度」项，其余顺序不变。
+            XCTAssertTrue(FileManager.default.fileExists(atPath:file.appendingPathExtension("before-quota-split").path))
+            XCTAssertEqual(manager.menuKeys,["gpt.usage","gpt.usage7d","tokens.today","pomodoro"])
             try manager.saveDisplay(order:["system.cpu","system.cpu"],menuOrder:[],catalogOrder:["system.cpu"],cpuTemperatureKey:"TC0F")
             let updated = try XCTUnwrap(JSONSerialization.jsonObject(with:Data(contentsOf:file)) as? [String:Any])
+            // 迁移标记持久化：之后的保存不会被再次迁移，选择保持原样。
+            XCTAssertEqual(updated["quotaSplitVersion"] as? Int,1)
             XCTAssertEqual(updated["order"] as? [String],["system.cpu","future.metric"])
             XCTAssertNotNil(updated["futureSetting"])
             XCTAssertEqual((updated["scripts"] as? [[String:Any]])?.count,1)
@@ -121,6 +125,7 @@ import SystemMonitoring
         touchBarItemReady: true,
         codexTouchBarItemReady: true,
         quotaTouchBarItemReady: true,
+        quota7dTouchBarItemReady: true,
         workbuddyTouchBarItemReady: true,
         tokenTouchBarItemReady: true,
         renderCount: 0,

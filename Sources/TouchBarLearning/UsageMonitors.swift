@@ -129,6 +129,24 @@ struct CodexQuotaSnapshot: Equatable {
     let isStale: Bool
     var awaitingReset = false
 
+    /// 额度窗口的显示范围：菜单栏摘要把 5h 与 7d 拆成独立项后按窗口取值。
+    enum WindowScope {
+        case fiveHour
+        case sevenDay
+        case combined
+    }
+
+    private var scopedWindows: [(short: String, label: String, icon: String, scope: WindowScope)] {
+        [
+            ("5h", "5小时", "⏳", .fiveHour),
+            ("7d", "7天", "📅", .sevenDay),
+        ]
+    }
+
+    private func selectedScopes(_ scope: WindowScope) -> [(short: String, label: String, icon: String, scope: WindowScope)] {
+        scopedWindows.filter { scope == .combined || $0.scope == scope }
+    }
+
     static let unavailable = CodexQuotaSnapshot(
         remainingPercent: nil,
         resetAt: nil,
@@ -153,13 +171,19 @@ struct CodexQuotaSnapshot: Equatable {
     }
 
     var touchBarText: String {
-        if windows.isEmpty && awaitingReset { return "⏳5小时待更新 · 📅7天待更新" }
+        touchBarText(scope: .combined)
+    }
+
+    func touchBarText(scope: WindowScope) -> String {
+        let selected = selectedScopes(scope)
+        if windows.isEmpty && awaitingReset {
+            return selected.map { "\($0.icon)\($0.label)待更新" }.joined(separator: " · ")
+        }
         let stale = isStale ? "·旧" : ""
-        return ["5小时", "7天"].map { label in
-            let icon = label == "5小时" ? "⏳" : "📅"
-            guard let window = windows.first(where: { $0.label == label }) else { return "\(icon)\(label) --" }
-            let countdown = label == "5小时" && !window.resetText.isEmpty ? " (\(window.resetText)重置)" : ""
-            return "\(icon)\(label)\(window.remainingPercent)%\(stale)\(countdown)"
+        return selected.map { pair in
+            guard let window = windows.first(where: { $0.label == pair.label }) else { return "\(pair.icon)\(pair.label) --" }
+            let countdown = pair.scope == .fiveHour && !window.resetText.isEmpty ? " (\(window.resetText)重置)" : ""
+            return "\(pair.icon)\(pair.label)\(window.remainingPercent)%\(stale)\(countdown)"
         }.joined(separator: " · ")
     }
 
@@ -169,20 +193,34 @@ struct CodexQuotaSnapshot: Equatable {
         statusBarText(now: Date(), timeZone: .autoupdatingCurrent)
     }
 
-    func statusBarText(now: Date, timeZone: TimeZone) -> String {
+    func statusBarText(scope: WindowScope) -> String {
+        statusBarText(now: Date(), timeZone: .autoupdatingCurrent, scope: scope)
+    }
+
+    func statusBarText(now: Date, timeZone: TimeZone, scope: WindowScope = .combined) -> String {
+        let selected = selectedScopes(scope)
         if windows.isEmpty {
-            return awaitingReset ? "5h待更新 · 7d待更新" : "5h -- · 7d --"
+            return selected.map { pair in
+                awaitingReset ? "\(pair.short)待更新" : "\(pair.short) --"
+            }.joined(separator: " · ")
         }
-        let values = [("5h", "5小时"), ("7d", "7天")].map { key, label in
-            guard let window = windows.first(where: { $0.label == label }) else {
-                return key == "5h" ? "5h --（重置未知）" : "7d --"
+        let values = selected.map { pair in
+            guard let window = windows.first(where: { $0.label == pair.label }) else {
+                return pair.scope == .fiveHour ? "5h --（重置未知）" : "7d --"
             }
-            let reset = key == "5h"
+            let reset = pair.scope == .fiveHour
                 ? "（\(Self.localResetText(window.resetAt, now: now, timeZone: timeZone))）"
                 : ""
-            return "\(key)余\(window.remainingPercent)%\(reset)"
+            return "\(pair.short)余\(window.remainingPercent)%\(reset)"
         }.joined(separator: " · ")
         return values + (isStale ? "·旧" : "")
+    }
+
+    /// 单个窗口的剩余额度；窗口缺失时回落到全部窗口的最小值。
+    func remainingPercent(for scope: WindowScope) -> Int? {
+        guard scope != .combined else { return minimumRemainingPercent }
+        let label = scope == .fiveHour ? "5小时" : "7天"
+        return windows.first(where: { $0.label == label })?.remainingPercent ?? minimumRemainingPercent
     }
 
     private static func localResetText(_ resetAt: Date?, now: Date, timeZone: TimeZone) -> String {

@@ -15,6 +15,9 @@ private let codexItemIdentifier = NSTouchBarItem.Identifier(
 private let quotaItemIdentifier = NSTouchBarItem.Identifier(
     "io.github.yihuirui.goodtouchbar.codex.quota"
 )
+private let quota7dItemIdentifier = NSTouchBarItem.Identifier(
+    "io.github.yihuirui.goodtouchbar.codex.quota.7d"
+)
 private let workbuddyItemIdentifier = NSTouchBarItem.Identifier(
     "io.github.yihuirui.goodtouchbar.workbuddy"
 )
@@ -810,6 +813,7 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSTouchB
         switch key {
         case TouchBarPluginKey.gptStatus: return gptStatusTouchBarText
         case TouchBarPluginKey.gptUsage: return statusBarQuotaText
+        case TouchBarPluginKey.gptUsage7d: return statusBarQuota7dText
         case TouchBarPluginKey.workbuddy: return workbuddyTouchBarText
         case TouchBarPluginKey.agentSpeed: return agentSpeedTouchBarText
         case TouchBarPluginKey.todayTokens: return tokenTouchBarText
@@ -847,6 +851,10 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSTouchB
                 alert.alertStyle = .informational
                 alert.addButton(withTitle: "好")
                 alert.runModal()
+            }
+            monitorSettings?.menuBarWidthChanged = { [weak self] _ in
+                // 菜单栏宽度档位由设置窗口直接持久化，这里只需立即重绘。
+                self?.renderAndNotify()
             }
         }
         monitorSettings?.diagnosticState = { [weak self] in
@@ -898,9 +906,19 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSTouchB
         statusBarSummaryPresentation().attributedTitle.string
     }
 
-    func statusBarSummaryPresentation() -> StatusBarSummaryPresentation {
+    func statusBarSummaryPresentation(screenWidth: CGFloat? = nil) -> StatusBarSummaryPresentation {
         let keys = pluginManager.menuKeys.filter {
             touchBarEnabled && !usesLegacyPomodoroStatusItem() || $0 != TouchBarPluginKey.pomodoro
+        }
+        let resolvedScreenWidth = screenWidth ?? NSScreen.main?.frame.width
+        let preferredWidth = GoodTouchBarRuntimeConfiguration.preferredSummaryWidth(
+            forScreenWidth: resolvedScreenWidth,
+            mode: GoodTouchBarRuntimeConfiguration.menuBarWidthMode()
+        )
+        if let preferredWidth {
+            return StatusBarSummaryPresentation.make(keys: keys, maximumItemWidth: preferredWidth) {
+                self.displayText(for: $0)
+            }
         }
         return StatusBarSummaryPresentation.make(keys: keys) { self.displayText(for: $0) }
     }
@@ -914,7 +932,11 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSTouchB
     }
 
     private var statusBarQuotaText: String {
-        quotaMonitor.snapshot.statusBarText
+        quotaMonitor.snapshot.statusBarText(now: Date(), timeZone: .autoupdatingCurrent, scope: .fiveHour)
+    }
+
+    private var statusBarQuota7dText: String {
+        quotaMonitor.snapshot.statusBarText(now: Date(), timeZone: .autoupdatingCurrent, scope: .sevenDay)
     }
 
     private var statusBarTokenText: String {
@@ -957,6 +979,7 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSTouchB
             touchBarItemReady: !activeTouchBarIdentifiers.contains(pomodoroItemIdentifier) || globalTouchBarItems[pomodoroItemIdentifier] != nil,
             codexTouchBarItemReady: !activeTouchBarIdentifiers.contains(codexItemIdentifier) || globalTouchBarItems[codexItemIdentifier] != nil,
             quotaTouchBarItemReady: !activeTouchBarIdentifiers.contains(quotaItemIdentifier) || globalTouchBarItems[quotaItemIdentifier] != nil,
+            quota7dTouchBarItemReady: !activeTouchBarIdentifiers.contains(quota7dItemIdentifier) || globalTouchBarItems[quota7dItemIdentifier] != nil,
             workbuddyTouchBarItemReady: !activeTouchBarIdentifiers.contains(workbuddyItemIdentifier) || globalTouchBarItems[workbuddyItemIdentifier] != nil,
             tokenTouchBarItemReady: !activeTouchBarIdentifiers.contains(tokenItemIdentifier) || globalTouchBarItems[tokenItemIdentifier] != nil,
             renderCount: renderCount,
@@ -1063,10 +1086,26 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSTouchB
                 target: self,
                 action: #selector(refreshUsageFromTouchBar)
             )
+            item.customizationLabel = "5h额度"
+            item.visibilityPriority = .low
+            item.bezelColor = TouchBarStateColors.quota(
+                quotaMonitor.snapshot.remainingPercent(for: .fiveHour) ?? quotaMonitor.snapshot.minimumRemainingPercent,
+                isStale: quotaMonitor.snapshot.isStale
+            )
+            quotaTouchBarButton = item
+            return item
+
+        case quota7dItemIdentifier:
+            let item = NSButtonTouchBarItem(
+                identifier: identifier,
+                title: gptUsage7dTouchBarText,
+                target: self,
+                action: #selector(refreshUsageFromTouchBar)
+            )
             item.customizationLabel = "7天额度"
             item.visibilityPriority = .low
             item.bezelColor = TouchBarStateColors.quota(
-                quotaMonitor.snapshot.minimumRemainingPercent,
+                quotaMonitor.snapshot.remainingPercent(for: .sevenDay) ?? quotaMonitor.snapshot.minimumRemainingPercent,
                 isStale: quotaMonitor.snapshot.isStale
             )
             quotaTouchBarButton = item
@@ -1525,6 +1564,7 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSTouchB
         switch key {
         case TouchBarPluginKey.gptStatus: return codexItemIdentifier
         case TouchBarPluginKey.gptUsage: return quotaItemIdentifier
+        case TouchBarPluginKey.gptUsage7d: return quota7dItemIdentifier
         case TouchBarPluginKey.workbuddy: return workbuddyItemIdentifier
         case TouchBarPluginKey.agentSpeed: return agentSpeedItemIdentifier
         case TouchBarPluginKey.todayTokens: return tokenItemIdentifier
@@ -1789,7 +1829,13 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSTouchB
             case quotaItemIdentifier:
                 item.title = gptUsageTouchBarText
                 item.bezelColor = TouchBarStateColors.quota(
-                    quotaMonitor.snapshot.minimumRemainingPercent,
+                    quotaMonitor.snapshot.remainingPercent(for: .fiveHour) ?? quotaMonitor.snapshot.minimumRemainingPercent,
+                    isStale: quotaMonitor.snapshot.isStale
+                )
+            case quota7dItemIdentifier:
+                item.title = gptUsage7dTouchBarText
+                item.bezelColor = TouchBarStateColors.quota(
+                    quotaMonitor.snapshot.remainingPercent(for: .sevenDay) ?? quotaMonitor.snapshot.minimumRemainingPercent,
                     isStale: quotaMonitor.snapshot.isStale
                 )
             case workbuddyItemIdentifier:
@@ -1835,7 +1881,11 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSTouchB
     }
 
     private var gptUsageTouchBarText: String {
-        quotaMonitor.snapshot.touchBarText
+        quotaMonitor.snapshot.touchBarText(scope: .fiveHour)
+    }
+
+    private var gptUsage7dTouchBarText: String {
+        quotaMonitor.snapshot.touchBarText(scope: .sevenDay)
     }
 
     private var workbuddyTouchBarText: String {
@@ -2594,8 +2644,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             pomodoroStatusItem?.button?.attributedTitle = windowController.pomodoroStatusBarAttributedText()
             pomodoroStatusItem?.button?.toolTip = "点击开始番茄钟 · \(windowController.pomodoroMenuTitle())"
             if let button = statusItem?.button, let fallbackIcon = statusItemSourceIcon {
-                let summary = windowController.statusBarSummaryPresentation()
-                let icon = summary.visibleKeys.contains(TouchBarPluginKey.gptUsage)
+                let summary = windowController.statusBarSummaryPresentation(
+                    screenWidth: statusItem?.button?.window?.screen?.frame.width ?? NSScreen.main?.frame.width
+                )
+                let icon = summary.visibleKeys.contains { $0 == TouchBarPluginKey.gptUsage || $0 == TouchBarPluginKey.gptUsage7d }
                     ? (StatusBarIconCatalog.codexSummaryImage() ?? fallbackIcon)
                     : fallbackIcon
                 summary.apply(to: button, icon: icon)

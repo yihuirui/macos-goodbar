@@ -107,6 +107,34 @@ private final class StatusBarButtonActionProbe: NSObject {
         saveMenuSelection(Set(selectedMenuKeys))
         check(manager.menuKeys == selectedMenuKeys,"saved menu checkboxes retain their row order")
 
+        // 菜单栏宽度档位：纯逻辑映射 + 设置窗口控件与持久化联动。
+        check(GoodTouchBarRuntimeConfiguration.menuBarWidthMode() == .auto,"menu bar width defaults to auto")
+        check(GoodTouchBarRuntimeConfiguration.preferredSummaryWidth(forScreenWidth:2560,mode:.auto) == nil,"auto keeps the legacy full layout on wide displays")
+        check(GoodTouchBarRuntimeConfiguration.preferredSummaryWidth(forScreenWidth:1720,mode:.auto) == 340,"auto picks the standard tier on mid-size displays")
+        check(GoodTouchBarRuntimeConfiguration.preferredSummaryWidth(forScreenWidth:1512,mode:.auto) == 220,"auto picks the compact tier on small displays")
+        check(GoodTouchBarRuntimeConfiguration.preferredSummaryWidth(forScreenWidth:nil,mode:.auto) == nil,"auto falls back to the full layout without screen metrics")
+        check(GoodTouchBarRuntimeConfiguration.preferredSummaryWidth(forScreenWidth:1512,mode:.full) == nil,"manual full tier keeps the legacy layout")
+        check(GoodTouchBarRuntimeConfiguration.preferredSummaryWidth(forScreenWidth:2560,mode:.compact) == 220,"manual compact tier overrides the screen heuristic")
+        let widthPopup = views(content).compactMap { $0 as? NSPopUpButton }.first { $0.itemTitles.contains("紧凑") }!
+        check(widthPopup.itemTitles == ["自动","紧凑","标准","完整"],"menu bar width control exposes the four tiers")
+        func chooseMenuBarWidth(_ title:String) {
+            widthPopup.selectItem(withTitle:title)
+            if let action = widthPopup.action { NSApp.sendAction(action,to:widthPopup.target,from:widthPopup) }
+        }
+        chooseMenuBarWidth("紧凑")
+        check(GoodTouchBarRuntimeConfiguration.menuBarWidthMode() == .compact,"choosing a tier persists immediately")
+        check(views(content).compactMap { $0 as? NSTextField }.contains { $0.stringValue.contains("菜单栏宽度已保存") },"width change reports the immediate effect")
+        chooseMenuBarWidth("自动")
+        check(GoodTouchBarRuntimeConfiguration.menuBarWidthMode() == .auto,"switching back to auto persists")
+        UserDefaults.standard.removeObject(forKey:GoodTouchBarRuntimeConfiguration.menuBarWidthModeDefaultsKey)
+
+        // 额度拆分：5h 沿用 gpt.usage，7d 以独立键出现在目录与默认菜单里。
+        // 用全新配置验证迁移默认值，不受本测试前序保存动作影响。
+        let quotaManager = TouchBarPluginManager(configurationURL:dir.appendingPathComponent("quota-plugins.json"))
+        check(quotaManager.catalogKeys.contains(TouchBarPluginKey.gptUsage7d),"quota split exposes the 7d catalog row")
+        check(quotaManager.menuKeys.contains(TouchBarPluginKey.gptUsage) && quotaManager.menuKeys.contains(TouchBarPluginKey.gptUsage7d),
+              "default menu selection keeps both quota windows after the split")
+
         let summaryButton = NSStatusBarButton(frame:NSRect(x:0,y:0,width:StatusBarSummaryPresentation.maximumItemWidth,height:22))
         summaryButton.isBordered = false
         summaryButton.setAccessibilityLabel("goodtouchbar 状态详情")

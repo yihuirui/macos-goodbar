@@ -31,6 +31,8 @@ final class MonitorSettingsWindow: NSWindowController, NSWindowDelegate, NSTable
     var onNotifications: ((Bool) -> Void)?
     var notificationsEnabled = false
     var touchBarModeChanged: ((GoodTouchBarMode) -> Void)?
+    var menuBarWidthChanged: ((MenuBarWidthMode) -> Void)?
+    private let menuBarWidthChoice = NSPopUpButton()
     private var selectedTouchBarMode: GoodTouchBarMode
     private var exporting = false
     private let sensorChoice = NSPopUpButton()
@@ -76,7 +78,7 @@ final class MonitorSettingsWindow: NSWindowController, NSWindowDelegate, NSTable
         tabs.translatesAutoresizingMaskIntoConstraints = false; root.addArrangedSubview(tabs)
         let displayTab = NSTabViewItem(identifier: "display"); displayTab.label = "显示项目"
         let display = NSStackView(); display.orientation = .vertical; display.spacing = 10; display.edgeInsets = NSEdgeInsets(top:12,left:12,bottom:12,right:12)
-        let description = NSTextField(wrappingLabelWithString: "Touch Bar 和菜单栏摘要可分别选择。菜单栏勾选值显示在状态图标旁，空间不足时按顺序收进“···”；左键查看详情，右键打开完整菜单。拖动行或使用上移／下移调整顺序。")
+        let description = NSTextField(wrappingLabelWithString: "Touch Bar 和菜单栏摘要可分别选择。菜单栏勾选值显示在状态图标旁，空间不足时按顺序收进“···”；左键查看详情，右键打开完整菜单。“菜单栏宽度”默认按屏幕大小自动选档，也可手动固定。拖动行或使用上移／下移调整顺序。")
         display.addArrangedSubview(description)
         let modeRow = NSStackView(); modeRow.spacing = 10
         modeRow.addArrangedSubview(NSTextField(labelWithString: "Touch Bar 模式"))
@@ -86,6 +88,14 @@ final class MonitorSettingsWindow: NSWindowController, NSWindowDelegate, NSTable
         }
         touchBarModeChoice.target = self; touchBarModeChoice.action = #selector(changeTouchBarMode)
         modeRow.addArrangedSubview(touchBarModeChoice); display.addArrangedSubview(modeRow)
+        let widthRow = NSStackView(); widthRow.spacing = 10
+        widthRow.addArrangedSubview(NSTextField(labelWithString: "菜单栏宽度"))
+        for (mode, title) in [(MenuBarWidthMode.auto, "自动"), (.compact, "紧凑"), (.standard, "标准"), (.full, "完整")] {
+            menuBarWidthChoice.addItem(withTitle: title)
+            menuBarWidthChoice.lastItem?.representedObject = mode.rawValue
+        }
+        menuBarWidthChoice.target = self; menuBarWidthChoice.action = #selector(changeMenuBarWidthMode)
+        widthRow.addArrangedSubview(menuBarWidthChoice); display.addArrangedSubview(widthRow)
         deviceSummary.lineBreakMode = .byWordWrapping
         deviceSummary.font = .systemFont(ofSize: 11)
         display.addArrangedSubview(deviceSummary)
@@ -160,10 +170,18 @@ final class MonitorSettingsWindow: NSWindowController, NSWindowDelegate, NSTable
         rows = manager.catalogKeys; bar = Set(manager.visibleKeys); menuSelection = Set(manager.menuKeys)
         if let index = sensorChoice.itemArray.firstIndex(where: { $0.representedObject as? String == manager.selectedCPUTemperatureKey }) { sensorChoice.selectItem(at:index) }
         if let index = touchBarModeChoice.itemArray.firstIndex(where: { $0.representedObject as? String == selectedTouchBarMode.rawValue }) { touchBarModeChoice.selectItem(at:index) }
+        if let index = menuBarWidthChoice.itemArray.firstIndex(where: { $0.representedObject as? String == GoodTouchBarRuntimeConfiguration.menuBarWidthMode().rawValue }) { menuBarWidthChoice.selectItem(at:index) }
         let resolution = deviceCapabilities.resolveTouchBarMode(selectedTouchBarMode)
         deviceSummary.stringValue = "机型：\(deviceCapabilities.modelIdentifier ?? "unknown") · 架构：\(deviceCapabilities.architectureDescription) · 模式：\(resolution.requested.rawValue) → \(resolution.enabled ? "Touch Bar" : "菜单栏") · \(resolution.reason)"
         table.tableColumns.first(where: { $0.identifier.rawValue == "bar" })?.isHidden = !deviceCapabilities.touchBarSupported
         table.reloadData()
+    }
+    @objc private func changeMenuBarWidthMode() {
+        guard let raw = menuBarWidthChoice.selectedItem?.representedObject as? String,
+              let mode = MenuBarWidthMode(rawValue: raw) else { return }
+        UserDefaults.standard.set(mode.rawValue, forKey: GoodTouchBarRuntimeConfiguration.menuBarWidthModeDefaultsKey)
+        menuBarWidthChanged?(mode)
+        message.stringValue = "菜单栏宽度已保存并立即生效"
     }
     @objc private func changeTouchBarMode() {
         guard let raw = touchBarModeChoice.selectedItem?.representedObject as? String,
@@ -192,7 +210,8 @@ final class MonitorSettingsWindow: NSWindowController, NSWindowDelegate, NSTable
         if let metric = MetricID(rawValue:key) { return metric.name }
         switch key {
         case TouchBarPluginKey.gptStatus:return "ChatGPT 状态"
-        case TouchBarPluginKey.gptUsage:return "7 天额度"
+        case TouchBarPluginKey.gptUsage:return "5h 额度"
+        case TouchBarPluginKey.gptUsage7d:return "7d 额度"
         case TouchBarPluginKey.workbuddy:return "WB AI 状态"
         case TouchBarPluginKey.agentSpeed:return "AI 速度"
         case TouchBarPluginKey.todayTokens:return "今日词元"
@@ -229,7 +248,7 @@ final class MonitorSettingsWindow: NSWindowController, NSWindowDelegate, NSTable
         table.reloadData(); table.selectRowIndexes(IndexSet(integer:to),byExtendingSelection:false); message.stringValue = "有未保存的修改"; return true
     }
     @objc private func performancePreset() { bar = Set(MetricID.performancePreset); rows = DisplayLayout.unique(MetricID.performancePreset + rows); table.reloadData(); message.stringValue = "性能预设已选择，点保存生效" }
-    @objc private func resetDefaults() { bar = Set(TouchBarPluginKey.defaultOrder); menuSelection = Set([TouchBarPluginKey.gptUsage,TouchBarPluginKey.todayTokens,TouchBarPluginKey.pomodoro]); rows = DisplayLayout.unique(TouchBarPluginKey.defaultOrder + manager.allKeys); sensorChoice.selectItem(at:0); table.reloadData(); message.stringValue = "默认布局已选择，点保存生效" }
+    @objc private func resetDefaults() { bar = Set(TouchBarPluginKey.defaultOrder); menuSelection = Set([TouchBarPluginKey.gptUsage,TouchBarPluginKey.gptUsage7d,TouchBarPluginKey.todayTokens,TouchBarPluginKey.pomodoro]); rows = DisplayLayout.unique(TouchBarPluginKey.defaultOrder + manager.allKeys); sensorChoice.selectItem(at:0); table.reloadData(); message.stringValue = "默认布局已选择，点保存生效" }
     @objc private func save() {
         do {
             guard try manager.configurationData() == expectedConfiguration else { message.stringValue = "其他窗口已修改配置，请关闭本窗口后重新打开再保存。"; return }
@@ -251,7 +270,7 @@ final class MonitorSettingsWindow: NSWindowController, NSWindowDelegate, NSTable
         dashboard.notificationButton.state = notificationsEnabled ? .on : .off
         let performance = [MetricID.cpu, .memory, .pressure, .swap].map { snapshot.text(for: $0.rawValue) }
         dashboard.performance.stringValue = performance.joined(separator: "\n\n")
-        dashboard.secondary.stringValue = [TouchBarPluginKey.gptStatus, TouchBarPluginKey.workbuddy, TouchBarPluginKey.gptUsage].map(preview).joined(separator: "\n")
+        dashboard.secondary.stringValue = [TouchBarPluginKey.gptStatus, TouchBarPluginKey.workbuddy, TouchBarPluginKey.gptUsage, TouchBarPluginKey.gptUsage7d].map(preview).joined(separator: "\n")
         var thermal = [snapshot.text(for: MetricID.cpuTemperature.rawValue), snapshot.text(for: MetricID.gpuTemperature.rawValue), snapshot.text(for: MetricID.batteryTemperature.rawValue)]
         let fresh = snapshot.readings[MetricID.fans.rawValue]?.isFresh() == true
         for fan in snapshot.fans {

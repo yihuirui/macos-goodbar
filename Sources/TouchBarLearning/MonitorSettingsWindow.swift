@@ -189,8 +189,8 @@ final class MonitorSettingsWindow: NSWindowController, NSWindowDelegate, NSTable
         selectedTouchBarMode = mode
         touchBarModeChanged?(mode)
         let resolution = deviceCapabilities.resolveTouchBarMode(mode)
-        deviceSummary.stringValue = "机型：\(deviceCapabilities.modelIdentifier ?? "unknown") · 架构：\(deviceCapabilities.architectureDescription) · \(resolution.reason) · 重启 goodtouchbar 后生效"
-        message.stringValue = "Touch Bar 模式已保存；重启 goodtouchbar 后生效"
+        deviceSummary.stringValue = "机型：\(deviceCapabilities.modelIdentifier ?? "unknown") · 架构：\(deviceCapabilities.architectureDescription) · \(resolution.reason) · 重启 goodbar 后生效"
+        message.stringValue = "Touch Bar 模式已保存；重启 goodbar 后生效"
     }
     func numberOfRows(in tableView: NSTableView) -> Int { rows.count }
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {

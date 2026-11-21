@@ -27,12 +27,12 @@ case "$ARCH" in arm64|x86_64) ;; *) print -u2 "不支持的目标架构：$ARCH"
 TARGET_TRIPLE="${TARGET_TRIPLE:-$ARCH-apple-macosx13.0}"
 [[ "$TARGET_TRIPLE" == "$ARCH-apple-macosx13.0" ]] || { print -u2 "TARGET_TRIPLE 与 --arch 不匹配"; exit 64; }
 
-TASK_BUILD_DIR="${BUILD_SCRATCH_PATH:-$(mktemp -d "/private/tmp/goodtouchbar-035-${ARCH}-build.XXXXXX")}"
+TASK_BUILD_DIR="${BUILD_SCRATCH_PATH:-$(mktemp -d "/private/tmp/goodbar-035-${ARCH}-build.XXXXXX")}"
 TASK_MODULE_CACHE="${TASK_MODULE_CACHE:-$TASK_BUILD_DIR/module-cache}"
 DIST_DIR="${DIST_OUTPUT_DIR:-$ROOT_DIR/dist}"
-APP_DIR="${APP_OUTPUT_DIR:-$DIST_DIR/$RELEASE_VERSION/$ARCH/goodtouchbar.app}"
-ZIP_PATH="${ZIP_OUTPUT_PATH:-$DIST_DIR/goodtouchbar-$RELEASE_VERSION-$ARCH.zip}"
-MANIFEST_PATH="${MANIFEST_OUTPUT_PATH:-$DIST_DIR/goodtouchbar-$RELEASE_VERSION-$ARCH-build-manifest.txt}"
+APP_DIR="${APP_OUTPUT_DIR:-$DIST_DIR/$RELEASE_VERSION/$ARCH/goodbar.app}"
+ZIP_PATH="${ZIP_OUTPUT_PATH:-$DIST_DIR/goodbar-$RELEASE_VERSION-$ARCH.zip}"
+MANIFEST_PATH="${MANIFEST_OUTPUT_PATH:-$DIST_DIR/goodbar-$RELEASE_VERSION-$ARCH-build-manifest.txt}"
 CHECKSUM_PATH="$ZIP_PATH.sha256"
 IDENTITY="${CODE_SIGN_IDENTITY:--}"
 case "$TASK_BUILD_DIR" in /private/tmp/*|/private/var/folders/*/T/*) ;; *) print -u2 "构建目录必须位于临时目录：$TASK_BUILD_DIR"; exit 2 ;; esac
@@ -136,7 +136,7 @@ else
 fi
 APP_RELATIVE="${APP_DIR#$DIST_DIR/}"
 cat > "$MANIFEST_PATH" <<EOF
-name=goodtouchbar
+name=goodbar
 version=$RELEASE_VERSION
 build=$BUILD_NUMBER
 bundle=io.github.yihuirui.goodtouchbar

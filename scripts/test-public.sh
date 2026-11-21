@@ -13,4 +13,4 @@ swift build --disable-sandbox --configuration debug --triple "$TARGET_TRIPLE" \
     --scratch-path "$TASK_BUILD_DIR" -Xswiftc -module-cache-path -Xswiftc "$TASK_MODULE_CACHE"
 /bin/zsh scripts/test-public-features.sh
 /bin/zsh scripts/test-all.sh
-print "PASS: goodtouchbar public source test entry completed; no app, service, or hardware operation was started."
+print "PASS: goodbar public source test entry completed; no app, service, or hardware operation was started."

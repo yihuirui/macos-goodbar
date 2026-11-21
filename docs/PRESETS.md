@@ -1,6 +1,6 @@
 # Layout presets
 
-goodtouchbar provides **AI** and **System** starting layouts. They are arrangements of built-in controls and supported thresholds, not executable plugin bundles.
+goodbar provides **AI** and **System** starting layouts. They are arrangements of built-in controls and supported thresholds, not executable plugin bundles.
 
 ## Import and export
 
@@ -13,4 +13,4 @@ goodtouchbar provides **AI** and **System** starting layouts. They are arrangeme
 
 An AI layout is a convenient arrangement for quota, token, and agent activity items. A System layout emphasizes metrics and system controls. Names describe layout intent; they do not make local account data part of the preset. The JSON should contain configuration only. Review a file from another person before importing it.
 
-Presets are separate from application configuration and the previous BestTouchTool settings directory. goodtouchbar does not migrate, read, or overwrite that product's existing user configuration.
+Presets are separate from application configuration and the previous BestTouchTool settings directory. goodbar does not migrate, read, or overwrite that product's existing user configuration.

@@ -262,7 +262,7 @@ final class StatusDetailsPopoverController: NSObject, NSPopoverDelegate {
 
 @MainActor
 final class StatusDetailsViewController: NSViewController {
-    private let brandLabel = NSTextField(labelWithString: "goodtouchbar")
+    private let brandLabel = NSTextField(labelWithString: "goodbar")
     private let modeLabel = NSTextField(labelWithString: "")
     private let quotaCards = [StatusDetailsQuotaCard(title: "5 小时"), StatusDetailsQuotaCard(title: "7 天")]
     private let quotaFreshness = NSTextField(labelWithString: "")
@@ -314,7 +314,7 @@ final class StatusDetailsViewController: NSViewController {
             root.blendingMode = .behindWindow
             root.state = .active
         }
-        root.setAccessibilityLabel("goodtouchbar 状态详情")
+        root.setAccessibilityLabel("goodbar 状态详情")
         root.onLayout = { [weak self] in self?.updateDocumentFrame() }
         view = root
 
@@ -350,7 +350,7 @@ final class StatusDetailsViewController: NSViewController {
 
         brandLabel.font = .systemFont(ofSize: 17, weight: .bold)
         brandLabel.identifier = NSUserInterfaceItemIdentifier("details.brand")
-        brandLabel.setAccessibilityLabel("goodtouchbar")
+        brandLabel.setAccessibilityLabel("goodbar")
         modeLabel.font = .systemFont(ofSize: 11, weight: .semibold)
         modeLabel.textColor = .labelColor
         modeLabel.identifier = NSUserInterfaceItemIdentifier("details.mode")

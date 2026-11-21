@@ -14,7 +14,7 @@ Before opening an issue, check:
 
 ## What to include
 
-- goodtouchbar version and build
+- goodbar version and build
 - Mac model identifier, architecture (`arm64` or `x86_64`), and Touch Bar mode (Auto / On / Off)
 - macOS version
 - Expected and actual behavior, with concise reproduction steps

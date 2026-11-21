@@ -1,6 +1,6 @@
 # Build and CI
 
-goodtouchbar 0.3.5 builds separate native `x86_64` and `arm64` macOS 13+ application packages; these are not a universal binary. Each architecture is tested and packaged on a matching macOS runner; cross-compilation is not used as evidence that a target architecture works.
+goodbar 0.3.5 builds separate native `x86_64` and `arm64` macOS 13+ application packages; these are not a universal binary. Each architecture is tested and packaged on a matching macOS runner; cross-compilation is not used as evidence that a target architecture works.
 
 ## Local build
 

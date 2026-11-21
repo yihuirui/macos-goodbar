@@ -1,10 +1,10 @@
-# goodtouchbar
+# goodbar
 
 **版本 0.3.5 · build 8 · 实验预览版**
 
-goodtouchbar 是面向 Intel 与 Apple 芯片 Mac 的实验性 macOS 工具，将 AI 活动、部分系统指标和常用控制放入可配置的菜单与受支持硬件上的 Touch Bar。Touch Bar 是否存在取决于具体机型，不能只根据 Intel 或 Apple 芯片架构判断。源码在**私有仓库**维护，预览安装包通过该仓库的 GitHub Releases 分发，仅对有仓库访问权限的账号可见。
+goodbar 是面向 Intel 与 Apple 芯片 Mac 的实验性 macOS 工具，将 AI 活动、部分系统指标和常用控制放入可配置的菜单与受支持硬件上的 Touch Bar。Touch Bar 是否存在取决于具体机型，不能只根据 Intel 或 Apple 芯片架构判断。源码在**私有仓库**维护，预览安装包通过该仓库的 GitHub Releases 分发，仅对有仓库访问权限的账号可见。
 
-[私有 GitHub 仓库](https://github.com/yihuirui/goodtouchbar) · [Release 页面（需访问权限）](https://github.com/yihuirui/goodtouchbar/releases) · [English](README.md) · [硬件兼容性](docs/COMPATIBILITY.md) · [构建与 CI](docs/BUILDING.md) · [安装与卸载](docs/INSTALLATION.md) · [隐私说明](docs/PRIVACY.md) · [预设说明](docs/PRESETS.md) · [设计参考](docs/PROJECT-INFLUENCES.md)
+[私有 GitHub 仓库](https://github.com/yihuirui/goodbar) · [Release 页面（需访问权限）](https://github.com/yihuirui/goodbar/releases) · [English](README.md) · [硬件兼容性](docs/COMPATIBILITY.md) · [构建与 CI](docs/BUILDING.md) · [安装与卸载](docs/INSTALLATION.md) · [隐私说明](docs/PRIVACY.md) · [预设说明](docs/PRESETS.md) · [设计参考](docs/PROJECT-INFLUENCES.md)
 
 > **仓库状态：**本仓库目前为私有仓库。上方的源码与 Release 链接需要仓库访问权限，外部无法打开。若要对外分发预览安装包，请改用独立的公开仓库或发布到公开 Release。
 
@@ -18,11 +18,11 @@ goodtouchbar 是面向 Intel 与 Apple 芯片 Mac 的实验性 macOS 工具，�
 - **可选 WorkBuddy 监控：**可以绑定一个明确的国际版 WorkBuddy 聊天，并在识别到可重试错误时发起重试。重试会通过 WorkBuddy 客户端发送操作，可能产生服务用量。建立本机调试通道时，监控可能重新启动 WorkBuddy。
 - **Touch Bar 模式：**可选 **Auto**、**On**、**Off**。没有已保存设置时默认 Auto：仅在识别到受支持机型时启用 Touch Bar，已知不支持或未知机型使用仅菜单模式。On 不能在没有 Touch Bar 的设备上生成硬件；Off 使用仅菜单模式。更改后需重启应用生效。新偏好键 `touchBarMode` 优先；旧版 0.1 的 `touchBarEnabled=true` 映射为 On，`false` 映射为 Off。
 - **系统状态：**显示 CPU、内存、压力和可读取的温度。Apple 芯片上的 CPU 温度来自系统 thermal zone 读数，不是物理 CPU 核心温度；部分设备可能没有可用读数。
-- **风扇控制：**可选的特权辅助服务为实验性功能，仅在 goodtouchbar 确认以原生 Intel 架构运行时可用。真实目标设备上的风扇写入尚未验证。Apple 芯片仅在可用时读取风扇状态；arm64 包不包含或安装风扇辅助服务。
+- **风扇控制：**可选的特权辅助服务为实验性功能，仅在 goodbar 确认以原生 Intel 架构运行时可用。真实目标设备上的风扇写入尚未验证。Apple 芯片仅在可用时读取风扇状态；arm64 包不包含或安装风扇辅助服务。
 - **AI 与 System 布局：**内置预设使用 `goodtouchbar-layout` schema v2，分别保存 Touch Bar 和菜单布局。仍支持导入 v1 仅含栏布局的预设，并将布局迁移到两处。预设不能执行脚本、启动自动重试或更改风扇设置。
 - **仅菜单模式：**保留菜单栏应用、受支持的 AI 集成和系统监控；默认不启动或显示番茄钟。
 
-全局 Touch Bar 呈现和硬件传感器使用 macOS 私有接口，行为可能随 macOS 版本及设备变化。本项目不是稳定、功能齐全的 BetterTouchTool（BTT）替代品。我们研究过 HapticKey 的思路，但**没有集成**其触觉 API；goodtouchbar 不承诺 Touch Bar 或触控板触觉反馈。
+全局 Touch Bar 呈现和硬件传感器使用 macOS 私有接口，行为可能随 macOS 版本及设备变化。本项目不是稳定、功能齐全的 BetterTouchTool（BTT）替代品。我们研究过 HapticKey 的思路，但**没有集成**其触觉 API；goodbar 不承诺 Touch Bar 或触控板触觉反馈。
 
 ### 布局文字示意
 
@@ -53,13 +53,13 @@ Intel 构建请使用 `TEST_ARCH=x86_64` 和 `--arch x86_64`。本机原生构�
 
 ## 隐私与安全
 
-默认不启用 goodtouchbar 自有遥测服务，也不会把数据发送到 goodtouchbar 自有服务器。**这不表示应用完全离线：**集成会读取本机应用数据、启动或连接本地客户端，而客户端可能连接自己的 AI 服务。WorkBuddy 调试协议在本机 loopback 上监听且没有认证；随机本机端口和聊天绑定可以减少误连接，但不能消除协议风险。自动重试可能向当前绑定的 AI 服务再次发送请求。
+默认不启用 goodbar 自有遥测服务，也不会把数据发送到 goodbar 自有服务器。**这不表示应用完全离线：**集成会读取本机应用数据、启动或连接本地客户端，而客户端可能连接自己的 AI 服务。WorkBuddy 调试协议在本机 loopback 上监听且没有认证；随机本机端口和聊天绑定可以减少误连接，但不能消除协议风险。自动重试可能向当前绑定的 AI 服务再次发送请求。
 
 请阅读完整的[隐私与数据处理说明](docs/PRIVACY.md)及[安全报告政策](SECURITY.md)。分享诊断日志或本地状态文件前，请先检查内容。
 
 ## 项目状态
 
-0.3.5 / build 8 在额度被选中时恢复原始全彩 Codex 状态图标，并以本地时钟显示 5 小时额度重置时间；跨日时显示“明日”或具体日期。继续使用白色栅格摘要、12 pt 字号和至少三项选择。原生状态按钮像素夹具覆盖 Aqua、Dark Aqua、Vibrant Light、Vibrant Dark 灰色背景；arm64 包验证内置 PNG 与原图一致。0.3.4 加入全彩白字状态摘要。0.3.3 加入更宽的白色摘要和紧凑额度值；0.3.2 恢复原版黑色点赞 Dock 图标，并按复选框显示菜单摘要。此前 0.2.0 的 M1 Pro 只读采样获得了 CPU/内存数据、M1 CPU 热区温度及两个风扇 RPM 读数；这不等于原生 Intel 硬件已验收。0.1.0 / build 1 的准备记录保留在 [CHANGELOG.md](CHANGELOG.md)。本地检查和 GitHub 发布是不同状态，自动化检查也不能证明实体 Touch Bar 呈现、播放器响应、传感器覆盖或风扇写入效果。M1/M2 Touch Bar 机型举例来自 Apple 技术规格，不代表本应用已在这些设备验收。安装包为 ad-hoc 签名，尚未公证；请查看 [Release 页面](https://github.com/yihuirui/goodtouchbar/releases)了解发布状态。
+0.3.5 / build 8 在额度被选中时恢复原始全彩 Codex 状态图标，并以本地时钟显示 5 小时额度重置时间；跨日时显示“明日”或具体日期。继续使用白色栅格摘要、12 pt 字号和至少三项选择。原生状态按钮像素夹具覆盖 Aqua、Dark Aqua、Vibrant Light、Vibrant Dark 灰色背景；arm64 包验证内置 PNG 与原图一致。0.3.4 加入全彩白字状态摘要。0.3.3 加入更宽的白色摘要和紧凑额度值；0.3.2 恢复原版黑色点赞 Dock 图标，并按复选框显示菜单摘要。此前 0.2.0 的 M1 Pro 只读采样获得了 CPU/内存数据、M1 CPU 热区温度及两个风扇 RPM 读数；这不等于原生 Intel 硬件已验收。0.1.0 / build 1 的准备记录保留在 [CHANGELOG.md](CHANGELOG.md)。本地检查和 GitHub 发布是不同状态，自动化检查也不能证明实体 Touch Bar 呈现、播放器响应、传感器覆盖或风扇写入效果。M1/M2 Touch Bar 机型举例来自 Apple 技术规格，不代表本应用已在这些设备验收。安装包为 ad-hoc 签名，尚未公证；请查看 [Release 页面](https://github.com/yihuirui/goodbar/releases)了解发布状态。
 
 ## 参与贡献
 
@@ -67,4 +67,4 @@ Intel 构建请使用 `TEST_ARCH=x86_64` 和 `--arch x86_64`。本机原生构�
 
 ## 许可证
 
-goodtouchbar 原创贡献按 MIT License 提供，见 [LICENSE](LICENSE)。源自 Stats 的 AppleSMC 代码保留独立 MIT 归属，见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) 和 [Licenses/Stats-MIT.txt](Licenses/Stats-MIT.txt)。项目许可证不会自动重新许可第三方材料。
+goodbar 原创贡献按 MIT License 提供，见 [LICENSE](LICENSE)。源自 Stats 的 AppleSMC 代码保留独立 MIT 归属，见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) 和 [Licenses/Stats-MIT.txt](Licenses/Stats-MIT.txt)。项目许可证不会自动重新许可第三方材料。

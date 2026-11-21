@@ -137,12 +137,12 @@ private final class StatusBarButtonActionProbe: NSObject {
 
         let summaryButton = NSStatusBarButton(frame:NSRect(x:0,y:0,width:StatusBarSummaryPresentation.maximumItemWidth,height:22))
         summaryButton.isBordered = false
-        summaryButton.setAccessibilityLabel("goodbar 状态详情")
+        summaryButton.setAccessibilityLabel("GoodBar 状态详情")
         let actionProbe = StatusBarButtonActionProbe()
         summaryButton.target = actionProbe
         summaryButton.action = #selector(StatusBarButtonActionProbe.activate(_:))
         summaryButton.sendAction(on:[.leftMouseUp, .rightMouseUp])
-        let summaryIcon = NSImage(systemSymbolName:"bolt.horizontal.circle",accessibilityDescription:"goodbar 状态详情")!
+        let summaryIcon = NSImage(systemSymbolName:"bolt.horizontal.circle",accessibilityDescription:"GoodBar 状态详情")!
         summaryIcon.isTemplate = true
         summaryIcon.size = NSSize(width:16,height:16)
         let codexIconPath = "Resources/codex-status-icon.png"
@@ -211,7 +211,7 @@ private final class StatusBarButtonActionProbe: NSObject {
         check(renderedColor?.isEqual(NSColor.white) == true &&
               summaryButton.contentTintColor == nil && renderedFont?.pointSize == 12 &&
               summaryButton.accessibilityValue() as? String == summary.attributedTitle.string &&
-              summaryButton.accessibilityLabel() == "goodbar 状态详情" &&
+              summaryButton.accessibilityLabel() == "GoodBar 状态详情" &&
               summaryButton.target === actionProbe && summaryButton.action == #selector(StatusBarButtonActionProbe.activate(_:)),
               "rasterized status button keeps 12 pt white source text and its accessible native action path")
         let actionMask = NSEvent.EventTypeMask(rawValue:UInt64(truncatingIfNeeded:summaryButton.sendAction(on:[])))
@@ -257,7 +257,7 @@ private final class StatusBarButtonActionProbe: NSObject {
             let button = NSStatusBarButton(frame:NSRect(origin:.zero,size:size))
             button.isBordered = false
             button.appearance = NSAppearance(named:appearanceName)
-            button.setAccessibilityLabel("goodbar 状态详情")
+            button.setAccessibilityLabel("GoodBar 状态详情")
             let probe = StatusBarButtonActionProbe()
             button.target = probe
             button.action = #selector(StatusBarButtonActionProbe.activate(_:))

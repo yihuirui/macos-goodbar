@@ -5,7 +5,7 @@ Thanks for considering a contribution. This project targets Intel `x86_64` and A
 ## Before opening an issue or pull request
 
 - Search existing issues for the same problem.
-- For a bug, include the goodbar version/build, Mac architecture, macOS version, expected result, and concise reproduction steps.
+- For a bug, include the GoodBar version/build, Mac architecture, macOS version, expected result, and concise reproduction steps.
 - Never attach credentials, private session files, tokens, full user directories, or unredacted diagnostics to a public issue. Share only the minimum information needed.
 - Report security issues privately as described in [SECURITY.md](SECURITY.md).
 
@@ -35,7 +35,7 @@ By submitting a contribution, you agree that your original contribution is offer
 
 ## Maintenance expectations
 
-goodbar is maintained in spare time with limited weekly hours. There is no response SLA; if you have not heard back after seven days, a polite comment on the same thread is appropriate.
+GoodBar is maintained in spare time with limited weekly hours. There is no response SLA; if you have not heard back after seven days, a polite comment on the same thread is appropriate.
 
 We prioritize reproducible defects, safety-sensitive fixes, tests and documentation. Requests that change the project's scope (new hardware control, new runtime dependencies, or changes to the preset import schema) may be closed with a short explanation and a reference to this document. Refusing a patch is a temporary decision; accepting it means maintaining it for a long time.
 

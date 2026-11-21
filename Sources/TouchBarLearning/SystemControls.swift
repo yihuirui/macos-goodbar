@@ -314,7 +314,7 @@ final class SystemControlsWindow: NSWindowController, NSWindowDelegate {
         case .success:
             mediaStatusLabel.stringValue = "已发送系统播放/暂停键；当前播放器可能不响应。"
         case .failure(.accessibilityPermissionRequired):
-            mediaStatusLabel.stringValue = "未发送：请在“辅助功能设置”中允许 goodbar，然后再次点击。macOS 已请求授权。"
+            mediaStatusLabel.stringValue = "未发送：请在“辅助功能设置”中允许 GoodBar，然后再次点击。macOS 已请求授权。"
         case .failure(.eventCreationFailed):
             mediaStatusLabel.stringValue = "未发送：无法创建系统媒体键事件。"
         }

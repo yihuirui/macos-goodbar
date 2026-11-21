@@ -10,12 +10,12 @@ struct StatusDetailsPreviewApp {
         NSApplication.shared.setActivationPolicy(.regular)
         let previews = [
             makeWindow(
-                title: "goodbar Preview · Light · current data",
+                title: "GoodBar Preview · Light · current data",
                 appearance: .aqua,
                 snapshot: lightSnapshot
             ),
             makeWindow(
-                title: "goodbar Preview · Dark · expired quota + long WB status",
+                title: "GoodBar Preview · Dark · expired quota + long WB status",
                 appearance: .darkAqua,
                 snapshot: darkSnapshot
             ),

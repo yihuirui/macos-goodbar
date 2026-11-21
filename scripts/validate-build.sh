@@ -1,8 +1,8 @@
 #!/bin/zsh
 set -euo pipefail
 
-APP_DIR="${1:?usage: validate-build.sh /path/to/goodbar.app arm64|x86_64}"
-ARCH="${2:?usage: validate-build.sh /path/to/goodbar.app arm64|x86_64}"
+APP_DIR="${1:?usage: validate-build.sh /path/to/GoodBar.app arm64|x86_64}"
+ARCH="${2:?usage: validate-build.sh /path/to/GoodBar.app arm64|x86_64}"
 SOURCE_DIR="${0:A:h:h}"
 INFO_PLIST="$APP_DIR/Contents/Info.plist"
 MAIN_EXECUTABLE="$APP_DIR/Contents/MacOS/GoodTouchBar"
@@ -18,7 +18,7 @@ short_version=$(/usr/bin/plutil -extract CFBundleShortVersionString raw -o - "$I
 bundle_version=$(/usr/bin/plutil -extract CFBundleVersion raw -o - "$INFO_PLIST")
 touchbar_default=$(/usr/bin/plutil -extract GoodTouchBarTouchBarDefault raw -o - "$INFO_PLIST")
 icon_file=$(/usr/bin/plutil -extract CFBundleIconFile raw -o - "$INFO_PLIST")
-[[ "$bundle_identifier" == "io.github.yihuirui.goodtouchbar" && "$display_name" == "goodbar" && "$bundle_name" == "goodbar" ]] || { print -u2 "FAIL: brand or bundle identity mismatch"; exit 1; }
+[[ "$bundle_identifier" == "io.github.yihuirui.goodtouchbar" && "$display_name" == "GoodBar" && "$bundle_name" == "GoodBar" ]] || { print -u2 "FAIL: brand or bundle identity mismatch"; exit 1; }
 [[ "$short_version" == "0.3.5" && "$bundle_version" == "8" && "$touchbar_default" == "auto" ]] || { print -u2 "FAIL: version or Auto mode metadata mismatch"; exit 1; }
 [[ "$icon_file" == "GoodTouchBar.icns" && -f "$APP_DIR/Contents/Resources/$icon_file" ]] || { print -u2 "FAIL: configured app icon is missing"; exit 1; }
 /usr/bin/cmp -s "$SOURCE_DIR/Resources/GoodTouchBar.icns" "$APP_DIR/Contents/Resources/$icon_file" || { print -u2 "FAIL: bundled app icon differs from the source icon"; exit 1; }
@@ -61,4 +61,4 @@ source_build=$(/usr/bin/awk -F'= ' '/public static let fallback/{print $2}' "$SO
 for resource in Presets/专注AI.json Presets/系统监控.json; do
     [[ -f "$APP_DIR/Contents/Resources/$resource" ]] || { print -u2 "FAIL: bundled preset missing: $resource"; exit 1; }
 done
-print "PASS: goodbar 0.3.5 build 8, $ARCH app architecture, icons, signatures, runtime policy, and presets verified"
+print "PASS: GoodBar 0.3.5 build 8, $ARCH app architecture, icons, signatures, runtime policy, and presets verified"

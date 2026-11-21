@@ -176,7 +176,7 @@ private enum TouchBarAgentIcon {
             return cached
         }
         let symbol = resourceName.contains("workbuddy") ? "sparkles.rectangle.stack" : "terminal"
-        guard let image = NSImage(systemSymbolName: symbol, accessibilityDescription: "goodbar") else { return nil }
+        guard let image = NSImage(systemSymbolName: symbol, accessibilityDescription: "GoodBar") else { return nil }
         image.size = NSSize(width: 24, height: 24)
         image.isTemplate = true
         cache[resourceName] = image
@@ -204,7 +204,7 @@ private enum StatusBarIconCatalog {
             return cached
         }
         let symbol = resourceName.contains("workbuddy") ? "sparkles.rectangle.stack" : "terminal"
-        guard let image = NSImage(systemSymbolName: symbol, accessibilityDescription: "goodbar") else { return nil }
+        guard let image = NSImage(systemSymbolName: symbol, accessibilityDescription: "GoodBar") else { return nil }
         image.size = NSSize(width: 16, height: 16)
         image.isTemplate = true
         cache[resourceName] = image
@@ -847,7 +847,7 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSTouchB
                 let resolution = self.deviceCapabilities.resolveTouchBarMode(mode)
                 let alert = NSAlert()
                 alert.messageText = "Touch Bar 模式已保存"
-                alert.informativeText = "\(resolution.reason)\n请退出并重新打开 goodbar 后生效。"
+                alert.informativeText = "\(resolution.reason)\n请退出并重新打开 GoodBar 后生效。"
                 alert.alertStyle = .informational
                 alert.addButton(withTitle: "好")
                 alert.runModal()
@@ -1685,14 +1685,14 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSTouchB
         if requestedWBMonitoring && ([.error, .stale].contains(workbuddyMonitor.snapshot.state) || workbuddyMonitor.snapshot.title == "监控停止") { conditions.insert("wb_stopped") }
         let changes = incidents.update(conditions)
         if !changes.recovered.isEmpty {
-            let ids = changes.recovered.map { "goodbar.incident." + $0 }
+            let ids = changes.recovered.map { "GoodBar.incident." + $0 }
             UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers:ids)
             UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers:ids)
         }
         guard notificationsEnabled else { return }
         for key in changes.raised {
             let content = UNMutableNotificationContent(); content.title = "GoodTouchBar 运行异常"; content.body = Self.incidentNames[key] ?? "请查看运行状态"
-            UNUserNotificationCenter.current().add(UNNotificationRequest(identifier:"goodbar.incident." + key, content:content, trigger:nil))
+            UNUserNotificationCenter.current().add(UNNotificationRequest(identifier:"GoodBar.incident." + key, content:content, trigger:nil))
         }
     }
     private func setIncidentNotifications(_ enabled: Bool) {
@@ -1700,7 +1700,7 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSTouchB
         notificationGeneration += 1; let generation = notificationGeneration
         if !enabled {
             notificationsEnabled = false; UserDefaults.standard.set(false,forKey:"diagnosticNotifications")
-            let ids = Self.incidentNames.keys.map { "goodbar.incident." + $0 }
+            let ids = Self.incidentNames.keys.map { "GoodBar.incident." + $0 }
             UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers:ids)
             UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers:ids)
             monitorSettings?.notificationsEnabled = false; monitorSettings?.render(); return
@@ -2006,7 +2006,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
         if let icon = NSImage(
             systemSymbolName: "bolt.horizontal.circle",
-            accessibilityDescription: "goodbar 状态详情"
+            accessibilityDescription: "GoodBar 状态详情"
         ) {
             icon.isTemplate = true
             icon.size = NSSize(width: 16, height: 16)
@@ -2016,9 +2016,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem.button?.target = self
         statusItem.button?.action = #selector(handleStatusItemAction)
         statusItem.button?.sendAction(on: [.leftMouseUp, .rightMouseUp])
-        statusItem.button?.setAccessibilityLabel("goodbar 状态详情")
+        statusItem.button?.setAccessibilityLabel("GoodBar 状态详情")
         statusItem.button?.setAccessibilityHelp("点击查看状态详情；右键打开完整菜单")
-        statusItem.button?.toolTip = "goodbar · 点击查看状态详情 · 右键打开完整菜单"
+        statusItem.button?.toolTip = "GoodBar · 点击查看状态详情 · 右键打开完整菜单"
 
         let menu = NSMenu()
         let openItem = menu.addItem(
@@ -2258,7 +2258,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func installApplicationMenu() {
         let mainMenu = NSMenu()
-        let applicationName = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? "goodbar"
+        let applicationName = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? "GoodBar"
         let applicationItem = NSMenuItem(title: applicationName, action: nil, keyEquivalent: "")
         let applicationMenu = NSMenu(title: applicationName)
 
@@ -2277,7 +2277,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         settingsItem.keyEquivalentModifierMask = [.command]
         applicationMenu.addItem(.separator())
         let quitItem = applicationMenu.addItem(
-            withTitle: "退出 goodbar",
+            withTitle: "退出 GoodBar",
             action: #selector(quitApp),
             keyEquivalent: "q"
         )
@@ -2653,7 +2653,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 summary.apply(to: button, icon: icon)
                 statusItem.length = summary.itemLength
             }
-            statusItem?.button?.toolTip = "goodbar · 点击查看状态详情 · 右键打开完整菜单"
+            statusItem?.button?.toolTip = "GoodBar · 点击查看状态详情 · 右键打开完整菜单"
             statusDetailsPopover?.update(
                 windowController.statusDetailsSnapshot(menuBarMode: !appUsesTouchBar)
             )
@@ -2665,7 +2665,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 emptySummary.apply(to: button, icon: icon)
                 statusItem.length = emptySummary.itemLength
             }
-            statusItem?.button?.toolTip = "goodbar · 点击查看状态详情 · 右键打开完整菜单"
+            statusItem?.button?.toolTip = "GoodBar · 点击查看状态详情 · 右键打开完整菜单"
         }
         ensureStatusBarItemsVisible()
 
@@ -2690,7 +2690,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         default: icon = prefix + "!"
         }
         healthStatusIcon = icon
-        statusItem.button?.toolTip = "goodbar · \(snapshot.status) · 点击查看状态详情"
+        statusItem.button?.toolTip = "GoodBar · \(snapshot.status) · 点击查看状态详情"
         healthMenuItem.title = "运行状态：\(snapshot.message)"
         renderMenuControls()
     }

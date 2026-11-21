@@ -7,7 +7,7 @@ User-visible changes for each release are listed here.
 - Menu-bar summary width now adapts to the display: on narrow screens (below 1600 pt logical width) the summary switches to a compact layout, mid-size displays use a standard width, and wide displays keep the previous full layout. A new "菜单栏宽度" setting (设置 → 显示项目) lets you pin 紧凑 / 标准 / 完整 per machine, overriding the automatic choice; the change takes effect immediately.
 - The combined quota item ("7 天额度") is split into two independent items: "5h 额度" (five-hour window, keeps the `gpt.usage` key) and a new "7d 额度" (`gpt.usage7d`). Each can be toggled for the Touch Bar and the menu-bar summary separately, and each shows only its own window. Existing configurations are migrated once: `gpt.usage7d` is inserted right after `gpt.usage` so the visible content stays the same until you untick one of them.
 - The Dock icon now follows the Apple macOS icon grid: an 824×824 continuous-corner squircle centred on a 1024×1024 canvas with transparent margins, instead of the previous full-bleed rounded square, so it matches neighbouring icons in size and corner shape.
-- The app is renamed to "goodbar": the bundle folder, display name, installer zip and user-facing copy now say goodbar. The bundle identifier (`io.github.yihuirui.goodtouchbar`) and internal type names are unchanged, so settings and the fan helper keep working across the rename.
+- The app is renamed to "GoodBar": the bundle folder, display name, installer zip and user-facing copy now say GoodBar. The bundle identifier (`io.github.yihuirui.goodtouchbar`) and internal type names are unchanged, so settings and the fan helper keep working across the rename.
 
 ## 0.3.5 (build 8) — Codex status icon and reset clock
 
@@ -49,7 +49,7 @@ User-visible changes for each release are listed here.
 
 ## 0.2.0 (build 2) — experimental preview
 
-Released as an [experimental preview](https://github.com/yihuirui/goodtouchbar/releases/tag/v0.2.0), with native Apple silicon support alongside Intel.
+Released as an [experimental preview](https://github.com/yihuirui/GoodBar/releases/tag/v0.2.0), with native Apple silicon support alongside Intel.
 
 - Add Auto, On, and Off Touch Bar modes with model allowlist detection and conservative menu-only behavior for unsupported or unknown models.
 - Add Apple silicon CPU, memory, thermal-zone, AI activity, and menu-only support; keep fan readings read-only and omit the fan helper from arm64 packages.

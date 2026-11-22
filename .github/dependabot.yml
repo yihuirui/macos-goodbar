@@ -1,0 +1,19 @@
+version: 2
+updates:
+  # CI 与 CodeQL 使用的 Action 升级，跟随 ci.yml 的主版本 pin 策略。
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns:
+          - "*"
+
+  # 前端与工作台依赖。部分依赖在 patches/ 有本地补丁，升级 PR 若与补丁冲突会被
+  # 测试链拦下；按月合并一次即可。
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5

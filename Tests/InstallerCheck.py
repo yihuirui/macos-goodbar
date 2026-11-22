@@ -108,8 +108,8 @@ with tempfile.TemporaryDirectory(prefix="goodtouchbar-installer-check-") as temp
 
 install_agent = (ROOT / "scripts/install-autostart.sh").read_text()
 uninstall_agent = (ROOT / "scripts/uninstall-autostart.sh").read_text()
-check('LABEL="io.github.yihuirui.goodtouchbar"' in install_agent and 'APP_BUNDLE="/Applications/goodtouchbar.app"' in install_agent, "LaunchAgent install uses the new bundle and label")
-check('"$PROGRAM" == "/Applications/goodtouchbar.app/Contents/MacOS/GoodTouchBar"' in uninstall_agent, "LaunchAgent uninstall verifies the exact app path")
+check('LABEL="io.github.yihuirui.goodtouchbar"' in install_agent and 'APP_BUNDLE="/Applications/GoodBar.app"' in install_agent, "LaunchAgent install uses the new bundle and label")
+check('"$PROGRAM" == "/Applications/GoodBar.app/Contents/MacOS/GoodTouchBar"' in uninstall_agent, "LaunchAgent uninstall verifies the exact app path")
 check("com.learning.touchbarlearning" not in install_agent + uninstall_agent and "bootout.*OLD" not in install_agent + uninstall_agent, "autostart scripts do not take over the previous service")
 
 if args.app:

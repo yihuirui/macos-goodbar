@@ -2,7 +2,7 @@
 set -euo pipefail
 ROOT="${0:A:h:h}"
 cd "$ROOT"
-TASK_BUILD_DIR="${TASK_BUILD_DIR:-$(mktemp -d /private/tmp/goodtouchbar-public-tests.XXXXXX)}"
+TASK_BUILD_DIR="${TASK_BUILD_DIR:-$(mktemp -d /private/tmp/GoodBar-public-tests.XXXXXX)}"
 TASK_MODULE_CACHE="${TASK_MODULE_CACHE:-$TASK_BUILD_DIR/test-module-cache}"
 case "$TASK_BUILD_DIR" in /private/tmp/*|/private/var/folders/*/T/*) ;; *) print -u2 "测试目录必须位于临时目录：$TASK_BUILD_DIR"; exit 2 ;; esac
 mkdir -p "$TASK_MODULE_CACHE"

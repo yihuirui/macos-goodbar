@@ -3,7 +3,7 @@
 set -u
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-APP_DIR="${APP_DIR:-/Applications/goodtouchbar.app}"
+APP_DIR="${APP_DIR:-/Applications/GoodBar.app}"
 HEALTH_FILE="${HOME}/Library/Application Support/GoodTouchBar/health.json"
 MODE="all"
 failures=0

@@ -1,6 +1,6 @@
 # Build and CI
 
-GoodBar 0.3.5 builds separate native `x86_64` and `arm64` macOS 13+ application packages; these are not a universal binary. Each architecture is tested and packaged on a matching macOS runner; cross-compilation is not used as evidence that a target architecture works.
+GoodBar 0.3.6 builds separate native `x86_64` and `arm64` macOS 13+ application packages; these are not a universal binary. Each architecture is tested and packaged on a matching macOS runner; cross-compilation is not used as evidence that a target architecture works.
 
 ## Local build
 
@@ -22,10 +22,10 @@ TEST_ARCH=arm64 /bin/zsh scripts/test-public.sh
 
 Without an explicit test architecture, `scripts/test-public.sh` uses the native architecture. Its supported overrides are `TEST_ARCH=arm64|x86_64` or `TARGET_TRIPLE`. `build-app.sh` accepts `--arch arm64|x86_64` and defaults to the native architecture. Expected outputs are:
 
-- App bundle under `dist/0.3.5/arm64/` or `dist/0.3.5/x86_64/`.
-- `dist/GoodBar-0.3.5-arm64.zip` or `dist/GoodBar-0.3.5-x86_64.zip`.
+- App bundle under `dist/0.3.6/arm64/` or `dist/0.3.6/x86_64/`.
+- `dist/GoodBar-0.3.6-arm64.zip` or `dist/GoodBar-0.3.6-x86_64.zip`.
 - A `.sha256` sidecar alongside each ZIP.
-- `dist/GoodBar-0.3.5-{arch}-build-manifest.txt` for each target architecture.
+- `dist/GoodBar-0.3.6-{arch}-build-manifest.txt` for each target architecture.
 
 Builds without a Developer ID identity are ad-hoc signed, not Developer ID signed or notarized. This CI workflow supplies no signing identity and does not notarize its artifacts.
 

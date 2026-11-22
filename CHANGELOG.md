@@ -2,7 +2,7 @@
 
 User-visible changes for each release are listed here.
 
-## Unreleased
+## 0.3.6 (build 9) — adaptive menu-bar width, quota split, Apple-grid icon
 
 - Menu-bar summary width now adapts to the display: on narrow screens (below 1600 pt logical width) the summary switches to a compact layout, mid-size displays use a standard width, and wide displays keep the previous full layout. A new "菜单栏宽度" setting (设置 → 显示项目) lets you pin 紧凑 / 标准 / 完整 per machine, overriding the automatic choice; the change takes effect immediately.
 - The combined quota item ("7 天额度") is split into two independent items: "5h 额度" (five-hour window, keeps the `gpt.usage` key) and a new "7d 额度" (`gpt.usage7d`). Each can be toggled for the Touch Bar and the menu-bar summary separately, and each shows only its own window. Existing configurations are migrated once: `gpt.usage7d` is inserted right after `gpt.usage` so the visible content stays the same until you untick one of them.

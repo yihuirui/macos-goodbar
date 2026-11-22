@@ -20,7 +20,7 @@ require_temporary_path() {
     esac
 }
 
-TASK_BUILD_DIR="${TASK_BUILD_DIR:-$(mktemp -d /private/tmp/goodtouchbar-fan-control-tests.XXXXXX)}"
+TASK_BUILD_DIR="${TASK_BUILD_DIR:-$(mktemp -d /private/tmp/GoodBar-fan-control-tests.XXXXXX)}"
 TASK_BUILD_DIR="${TASK_BUILD_DIR:A}"
 TASK_MODULE_CACHE="${TASK_MODULE_CACHE:-$TASK_BUILD_DIR/test-module-cache}"
 TASK_MODULE_CACHE="${TASK_MODULE_CACHE:A}"

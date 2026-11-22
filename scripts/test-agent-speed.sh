@@ -2,7 +2,7 @@
 set -euo pipefail
 SOURCE_ROOT="${0:A:h:h}"
 cd "$SOURCE_ROOT"
-TASK_BUILD_DIR="${TASK_BUILD_DIR:-$(mktemp -d /private/tmp/goodtouchbar-agent-speed-tests.XXXXXX)}"
+TASK_BUILD_DIR="${TASK_BUILD_DIR:-$(mktemp -d /private/tmp/GoodBar-agent-speed-tests.XXXXXX)}"
 TASK_MODULE_CACHE="${TASK_MODULE_CACHE:-$TASK_BUILD_DIR/test-module-cache}"
 mkdir -p "$TASK_BUILD_DIR"
 . "$SOURCE_ROOT/scripts/test-architecture.zsh"

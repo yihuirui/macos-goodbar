@@ -3,7 +3,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-APP_BUNDLE="/Applications/goodtouchbar.app"
+APP_BUNDLE="/Applications/GoodBar.app"
 APP_EXECUTABLE="$APP_BUNDLE/Contents/MacOS/GoodTouchBar"
 LABEL="io.github.yihuirui.goodtouchbar"
 USER_HOME="${HOME}"
@@ -13,7 +13,7 @@ AGENT_PATH="$AGENT_DIR/$LABEL.plist"
 
 if [[ ! -x "$APP_EXECUTABLE" ]]; then
     print -u2 "找不到已部署的应用：$APP_BUNDLE"
-    print -u2 "请先把对应版本部署到 /Applications/goodtouchbar.app"
+    print -u2 "请先把对应版本部署到 /Applications/GoodBar.app"
     exit 1
 fi
 
@@ -26,11 +26,11 @@ if [[ -e "$AGENT_PATH" || -L "$AGENT_PATH" ]]; then
     EXISTING_LABEL=$(/usr/libexec/PlistBuddy -c 'Print :Label' "$AGENT_PATH")
     EXISTING_PROGRAM=$(/usr/libexec/PlistBuddy -c 'Print :ProgramArguments:0' "$AGENT_PATH")
     [[ "$EXISTING_LABEL" == "$LABEL" && "$EXISTING_PROGRAM" == "$APP_EXECUTABLE" ]] || {
-        print -u2 "已有启动项不属于 goodtouchbar，未覆盖它。"
+        print -u2 "已有启动项不属于 GoodBar，未覆盖它。"
         exit 1
     }
 fi
-AGENT_TEMP=$(mktemp "$AGENT_DIR/.goodtouchbar-launchagent.XXXXXX")
+AGENT_TEMP=$(mktemp "$AGENT_DIR/.GoodBar-launchagent.XXXXXX")
 cleanup() { [[ -z "${AGENT_TEMP:-}" ]] || rm -f "$AGENT_TEMP"; }
 trap cleanup EXIT HUP INT TERM
 

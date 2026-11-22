@@ -2,7 +2,7 @@
 
 ## Install
 
-GoodBar 0.3.5 provides separate `x86_64` Intel and `arm64` Apple silicon packages for macOS 13 or later. The app is menu-only on unsupported or unknown Mac models. See [hardware compatibility](COMPATIBILITY.md) for the initial Touch Bar model allowlist and Auto/On/Off behavior.
+GoodBar 0.3.6 provides separate `x86_64` Intel and `arm64` Apple silicon packages for macOS 13 or later. The app is menu-only on unsupported or unknown Mac models. See [hardware compatibility](COMPATIBILITY.md) for the initial Touch Bar model allowlist and Auto/On/Off behavior.
 
 1. Build from reviewed source in the [private repository (requires access)](https://github.com/yihuirui/GoodBar), or download the package matching your Mac from the [Releases page](https://github.com/yihuirui/GoodBar/releases). Preview packages are ad-hoc signed and not notarized.
 2. Move `GoodBar.app` to `/Applications`.

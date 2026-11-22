@@ -5,7 +5,7 @@ umask 077
 SOURCE_ROOT="${0:A:h:h}"
 cd "$SOURCE_ROOT"
 if (( EUID == 0 )); then print -u2 "请用普通用户运行，不要 sudo。"; exit 2; fi
-TASK_BUILD_DIR="${TASK_BUILD_DIR:-$(mktemp -d /private/tmp/goodtouchbar-hardware-tests.XXXXXX)}"
+TASK_BUILD_DIR="${TASK_BUILD_DIR:-$(mktemp -d /private/tmp/GoodBar-hardware-tests.XXXXXX)}"
 TASK_BUILD_DIR="${TASK_BUILD_DIR:A}"
 TASK_MODULE_CACHE="${TASK_MODULE_CACHE:-$TASK_BUILD_DIR/test-module-cache}"
 mkdir -p "$TASK_BUILD_DIR" "$TASK_MODULE_CACHE"

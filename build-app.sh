@@ -2,8 +2,8 @@
 set -euo pipefail
 
 ROOT_DIR="${0:A:h}"
-RELEASE_VERSION="0.3.5"
-BUILD_NUMBER="8"
+RELEASE_VERSION="0.3.6"
+BUILD_NUMBER="9"
 BUILD_CONFIGURATION="${BUILD_CONFIGURATION:-release}"
 ARCH="$(/usr/bin/uname -m)"
 OPEN_APP=0

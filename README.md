@@ -1,18 +1,39 @@
+<div align="center">
+
 # GoodBar
 
-**Version 0.3.5 · build 8 · experimental preview**
+**Version 0.3.6 · build 9 · experimental preview**
 
-GoodBar is an experimental macOS companion for Intel and Apple silicon Macs. It brings AI activity, selected system metrics, and everyday controls into a configurable menu and, on supported hardware, a Touch Bar. Touch Bar availability depends on the Mac model, not on whether the processor is Intel or Apple silicon. The source is maintained in a **private repository**; preview packages are distributed through its GitHub Releases and are only available to accounts with repository access.
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-macOS%2013%2B-lightgrey)](docs/COMPATIBILITY.md)
+[![Architecture](https://img.shields.io/badge/arch-Intel%20·%20Apple%20Silicon-blue)](docs/BUILDING.md)
+[![Status](https://img.shields.io/badge/status-experimental%20preview-orange)](#project-status)
 
-[Private GitHub repository](https://github.com/yihuirui/GoodBar) · [Releases (requires access)](https://github.com/yihuirui/GoodBar/releases) · [简体中文](README.zh-CN.md) · [Hardware compatibility](docs/COMPATIBILITY.md) · [Build and CI](docs/BUILDING.md) · [Install and remove](docs/INSTALLATION.md) · [Privacy](docs/PRIVACY.md) · [Presets](docs/PRESETS.md) · [Design influences](docs/PROJECT-INFLUENCES.md)
+**AI activity, selected system metrics, and everyday controls in the macOS menu bar — and on supported hardware, the Touch Bar.**
 
-> **Repository status:** this repository is currently private. The source and Releases links above require repository access and are not publicly reachable. To distribute preview builds externally, publish them from a separate public repository or attach them to a public release.
+[Install](#install) · [What it does](#what-it-does) · [Build from source](#build-from-source) · [Privacy](#privacy-and-security) · [简体中文](README.zh-CN.md)
+
+</div>
+
+---
+
+GoodBar is an experimental macOS companion for Intel and Apple silicon Macs. Touch Bar availability depends on the Mac model, not on whether the processor is Intel or Apple silicon.
+
+> **Repository status:** the source lives in the public [`macos-goodbar`](https://github.com/yihuirui/macos-goodbar) repository, and prebuilt packages are attached to [GitHub Releases](https://github.com/yihuirui/macos-goodbar/releases). Packages are ad-hoc signed and not notarized.
+
+## Install
+
+1. Download `GoodBar-0.3.6-<arch>.zip` from the [latest release](https://github.com/yihuirui/macos-goodbar/releases/latest) — `arm64` for Apple silicon, `x86_64` for Intel.
+2. Unzip and drag `GoodBar.app` into `/Applications`.
+3. First launch: the package is ad-hoc signed and not notarized, so Gatekeeper may ask for confirmation — right-click the app and choose **Open**, or clear the quarantine attribute with `xattr -cr /Applications/GoodBar.app`.
+4. See [installation and removal](docs/INSTALLATION.md) for details, including the optional fan helper.
 
 ## What it does
 
+- **Adaptive menu-bar width:** the summary auto-selects compact, standard, or full layout tiers based on screen width; pin 紧凑 / 标准 / 完整 per machine in the settings, and the change takes effect immediately.
 - **Status details:** checked menu-bar items appear beside the status icon in saved order, with a compact overflow marker when space runs short; with no selected items, the icon remains available for its menu actions. Left-click the main status item to view clearly grouped quota values, today's token usage, AI status, and a compact system overview. Healthy quota values use neutral text; low quota states retain explicit warnings. WorkBuddy controls emphasize the action available in the current monitoring state. The bottom toolbar stays visible while the content scrolls. Right-click, or choose More in the panel, to open the complete action menu. Retry and hardware actions keep their existing confirmation and capability checks.
+- **Independent quota items:** the five-hour and seven-day quota windows are two separate, individually toggleable items for the Touch Bar and the menu-bar summary; each shows only its own window.
 - **App icon and Dock access:** restore the original black thumbs-up app icon. The app stays visible in the Dock in Touch Bar and menu-only modes; clicking its Dock icon reopens the main window, and the app menu opens display settings directly.
-
 - **System controls:** a single tap on the Touch Bar item opens a native controls panel; a long press toggles mute directly. The panel provides a main-output volume slider, mute, play/pause, and a list of running apps. Play/pause posts a system-defined macOS media event. Clicking it requires Accessibility permission; macOS prompts for access, and the panel offers a link to Accessibility settings if access is denied. A player may ignore the event, and playback response has not been validated on a physical target Mac.
 - **AI activity:** displays Codex quota data read from recent local rollout records, optional token totals through OpenToken, agent output-speed estimates from recent local session events, and WorkBuddy activity. Codex rollout updates can lag, so quota values may be stale.
 - **Optional WorkBuddy monitor:** can watch a specifically bound international WorkBuddy chat and retry a detected retryable error. A retry sends an action through the WorkBuddy client and may consume service usage. The monitor can relaunch WorkBuddy when it needs to establish its local debugging channel.
@@ -59,7 +80,7 @@ Read the full [privacy and data handling notes](docs/PRIVACY.md) and [security r
 
 ## Project status
 
-0.3.5 / build 8 restores the original full-color Codex status icon when quota is selected and shows the five-hour reset as a local clock time, including tomorrow or a dated time when needed. The white raster summary, 12 pt size and three-item selection remain. Native status-button pixel fixtures cover Aqua, Dark Aqua, Vibrant Light and Vibrant Dark on gray; the isolated arm64 package verifies that the bundled Codex PNG matches the original resource. 0.3.4 introduced the full-color white-text status renderer. 0.3.3 introduced the wider white summary and compact quota values. 0.3.2 restored the original black thumbs-up Dock icon and checkbox-selected menu values. Earlier 0.2.0 read-only sampling on an M1 Pro returned CPU/memory data, M1 CPU thermal-zone readings, and two fan RPM readings. This does not validate native Intel hardware. The 0.1.0 / build 1 preparation is retained in [CHANGELOG.md](CHANGELOG.md). Local checks and GitHub publication are separate statuses, and automated checks do not establish physical Touch Bar presentation, player response, sensor coverage, or fan-write behavior. M1/M2 Touch Bar model examples are based on Apple specifications, not hardware acceptance of this app. Packages are ad-hoc signed and not notarized; check the [Releases page](https://github.com/yihuirui/GoodBar/releases) for publication status.
+0.3.6 / build 9 ships the adaptive menu-bar width, independent 5h/7d quota items, an Apple-grid Dock icon, and the GoodBar rename; see [CHANGELOG.md](CHANGELOG.md) for the full history. Automated checks and GitHub publication are separate statuses, and automated checks do not establish physical Touch Bar presentation, player response, sensor coverage, or fan-write behavior. M1/M2 Touch Bar model examples are based on Apple specifications, not hardware acceptance of this app. Packages are ad-hoc signed and not notarized; check the [Releases page](https://github.com/yihuirui/macos-goodbar/releases) for publication status.
 
 ## Contributing
 

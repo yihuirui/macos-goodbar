@@ -2,7 +2,7 @@
 set -euo pipefail
 SOURCE_ROOT="${0:A:h:h}"
 cd "$SOURCE_ROOT"
-TASK_BUILD_DIR="${TASK_BUILD_DIR:-$(mktemp -d /private/tmp/goodtouchbar-dashboard-tests.XXXXXX)}"
+TASK_BUILD_DIR="${TASK_BUILD_DIR:-$(mktemp -d /private/tmp/GoodBar-dashboard-tests.XXXXXX)}"
 TASK_MODULE_CACHE="${TASK_MODULE_CACHE:-$TASK_BUILD_DIR/test-module-cache}"
 . "$SOURCE_ROOT/scripts/test-architecture.zsh"
 swift build --disable-sandbox --triple "$TARGET_TRIPLE" --scratch-path "$TASK_BUILD_DIR" -Xswiftc -module-cache-path -Xswiftc "$TASK_MODULE_CACHE"

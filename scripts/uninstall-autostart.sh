@@ -11,10 +11,10 @@ fi
 /usr/bin/plutil -lint "$AGENT_PATH" >/dev/null
 FOUND_LABEL=$(/usr/libexec/PlistBuddy -c 'Print :Label' "$AGENT_PATH")
 PROGRAM=$(/usr/libexec/PlistBuddy -c 'Print :ProgramArguments:0' "$AGENT_PATH")
-[[ "$FOUND_LABEL" == "$LABEL" && "$PROGRAM" == "/Applications/goodtouchbar.app/Contents/MacOS/GoodTouchBar" ]] || {
+[[ "$FOUND_LABEL" == "$LABEL" && "$PROGRAM" == "/Applications/GoodBar.app/Contents/MacOS/GoodTouchBar" ]] || {
     print -u2 "启动项内容不匹配，未停止服务或删除文件。"
     exit 1
 }
 launchctl bootout "gui/$(id -u)/$LABEL" 2>/dev/null || true
 rm "$AGENT_PATH"
-print "已移除 goodtouchbar 启动项；用户数据和日志已保留。"
+print "已移除 GoodBar 启动项；用户数据和日志已保留。"

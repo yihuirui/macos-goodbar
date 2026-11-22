@@ -1,18 +1,39 @@
+<div align="center">
+
 # GoodBar
 
-**版本 0.3.5 · build 8 · 实验预览版**
+**版本 0.3.6 · build 9 · 实验预览版**
 
-GoodBar 是面向 Intel 与 Apple 芯片 Mac 的实验性 macOS 工具，将 AI 活动、部分系统指标和常用控制放入可配置的菜单与受支持硬件上的 Touch Bar。Touch Bar 是否存在取决于具体机型，不能只根据 Intel 或 Apple 芯片架构判断。源码在**私有仓库**维护，预览安装包通过该仓库的 GitHub Releases 分发，仅对有仓库访问权限的账号可见。
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-macOS%2013%2B-lightgrey)](docs/COMPATIBILITY.md)
+[![Architecture](https://img.shields.io/badge/arch-Intel%20·%20Apple%20Silicon-blue)](docs/BUILDING.md)
+[![Status](https://img.shields.io/badge/status-experimental%20preview-orange)](#项目状态)
 
-[私有 GitHub 仓库](https://github.com/yihuirui/GoodBar) · [Release 页面（需访问权限）](https://github.com/yihuirui/GoodBar/releases) · [English](README.md) · [硬件兼容性](docs/COMPATIBILITY.md) · [构建与 CI](docs/BUILDING.md) · [安装与卸载](docs/INSTALLATION.md) · [隐私说明](docs/PRIVACY.md) · [预设说明](docs/PRESETS.md) · [设计参考](docs/PROJECT-INFLUENCES.md)
+**把 AI 活动、精选系统指标和常用控制放进 macOS 菜单栏——在受支持的机型上还有 Touch Bar。**
 
-> **仓库状态：**本仓库目前为私有仓库。上方的源码与 Release 链接需要仓库访问权限，外部无法打开。若要对外分发预览安装包，请改用独立的公开仓库或发布到公开 Release。
+[安装](#安装) · [功能](#功能) · [从源码构建](#从源码构建) · [隐私与安全](#隐私与安全) · [English](README.md)
+
+</div>
+
+---
+
+GoodBar 是面向 Intel 与 Apple 芯片 Mac 的实验性 macOS 工具。Touch Bar 是否存在取决于具体机型，不能只根据 Intel 或 Apple 芯片架构判断。
+
+> **仓库状态：**源码在公开的 [`macos-goodbar`](https://github.com/yihuirui/macos-goodbar) 仓库维护，预构建安装包附带在 [GitHub Releases](https://github.com/yihuirui/macos-goodbar/releases)。安装包为 ad-hoc 签名，尚未公证。
+
+## 安装
+
+1. 从[最新 Release](https://github.com/yihuirui/macos-goodbar/releases/latest) 下载 `GoodBar-0.3.6-<arch>.zip`——Apple 芯片选 `arm64`，Intel 选 `x86_64`。
+2. 解压后把 `GoodBar.app` 拖入「应用程序」。
+3. 首次启动：安装包为 ad-hoc 签名且未公证，Gatekeeper 可能要求确认——右键点击应用选择**打开**，或用 `xattr -cr /Applications/GoodBar.app` 清除隔离属性。
+4. 细节（含可选风扇辅助服务）见[安装与卸载说明](docs/INSTALLATION.md)。
 
 ## 功能
 
+- **菜单栏宽度自适应：**摘要按屏幕逻辑宽度自动选择紧凑、标准或完整档位；也可在设置里按机器固定「紧凑 / 标准 / 完整」，保存后立即生效。
 - **状态详情：**菜单栏摘要按保存顺序显示“菜单栏摘要”列中勾选的项目；空间不足时显示紧凑的溢出标记，未勾选项目时仍保留图标和菜单操作。左键点击主状态项，查看清晰分组的额度、今日 Token、AI 状态和系统概览；健康额度使用中性文字，低额度保留明确警告；WorkBuddy 操作按当前监控状态突出可用操作；底部工具栏保持可见，正文可滚动；右键或面板中的“更多”打开完整操作菜单。重试和硬件操作沿用既有确认与机型能力检查。
+- **额度独立项：**5 小时与 7 天两个额度窗口拆分为两个独立项，可分别勾选 Touch Bar 与菜单栏摘要；每项只显示自己窗口的数值。
 - **应用图标与 Dock：**恢复原版黑色点赞图标。Touch Bar 和仅菜单模式都会在 Dock 中显示应用；点击 Dock 图标可重新打开主窗口，应用菜单可直接进入显示设置。
-
 - **系统控制：**轻点 Touch Bar 项目打开原生控制面板；长按可直接切换静音。面板提供主输出音量滑块、静音、播放/暂停和正在运行的应用列表。播放/暂停发送 macOS 系统定义的媒体事件。点击该按钮需要“辅助功能”权限；macOS 会请求授权，未授权时面板提供打开辅助功能设置的入口。播放器可能不响应该事件，且尚未在实体目标 Mac 上验收播放控制效果。
 - **AI 活动：**显示从本地近期 rollout 记录读取的 Codex 额度、通过 OpenToken 获取的可选 Token 总量、从近期本地会话事件估算的 AI 输出速度，以及 WorkBuddy 活动状态。Codex rollout 更新可能延迟，因此额度数据可能过时。
 - **可选 WorkBuddy 监控：**可以绑定一个明确的国际版 WorkBuddy 聊天，并在识别到可重试错误时发起重试。重试会通过 WorkBuddy 客户端发送操作，可能产生服务用量。建立本机调试通道时，监控可能重新启动 WorkBuddy。
@@ -59,7 +80,7 @@ Intel 构建请使用 `TEST_ARCH=x86_64` 和 `--arch x86_64`。本机原生构�
 
 ## 项目状态
 
-0.3.5 / build 8 在额度被选中时恢复原始全彩 Codex 状态图标，并以本地时钟显示 5 小时额度重置时间；跨日时显示“明日”或具体日期。继续使用白色栅格摘要、12 pt 字号和至少三项选择。原生状态按钮像素夹具覆盖 Aqua、Dark Aqua、Vibrant Light、Vibrant Dark 灰色背景；arm64 包验证内置 PNG 与原图一致。0.3.4 加入全彩白字状态摘要。0.3.3 加入更宽的白色摘要和紧凑额度值；0.3.2 恢复原版黑色点赞 Dock 图标，并按复选框显示菜单摘要。此前 0.2.0 的 M1 Pro 只读采样获得了 CPU/内存数据、M1 CPU 热区温度及两个风扇 RPM 读数；这不等于原生 Intel 硬件已验收。0.1.0 / build 1 的准备记录保留在 [CHANGELOG.md](CHANGELOG.md)。本地检查和 GitHub 发布是不同状态，自动化检查也不能证明实体 Touch Bar 呈现、播放器响应、传感器覆盖或风扇写入效果。M1/M2 Touch Bar 机型举例来自 Apple 技术规格，不代表本应用已在这些设备验收。安装包为 ad-hoc 签名，尚未公证；请查看 [Release 页面](https://github.com/yihuirui/GoodBar/releases)了解发布状态。
+0.3.6 / build 9 包含菜单栏宽度自适应、5h/7d 额度独立项、Apple 官方网格 Dock 图标以及 GoodBar 改名；完整历史见 [CHANGELOG.md](CHANGELOG.md)。本地检查和 GitHub 发布是不同状态，自动化检查也不能证明实体 Touch Bar 呈现、播放器响应、传感器覆盖或风扇写入效果。M1/M2 Touch Bar 机型举例来自 Apple 技术规格，不代表本应用已在这些设备验收。安装包为 ad-hoc 签名，尚未公证；请查看 [Release 页面](https://github.com/yihuirui/macos-goodbar/releases)了解发布状态。
 
 ## 参与贡献
 
